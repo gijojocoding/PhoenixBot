@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.WebSocket;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -28,6 +29,6 @@ namespace PhoenixBot
         public DateTime DayChecked { get; set; }
 
         public bool DebateRunning { get; set; }
-        public ulong StickHolder { get; set; }
+        public SocketGuildUser StickHolder { get; set; }
     }
 }

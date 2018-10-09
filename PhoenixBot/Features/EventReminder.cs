@@ -25,9 +25,9 @@ namespace PhoenixBot.Features
             return Task.CompletedTask;
         }
 
-        private static void CheckEvent(object sender, ElapsedEventArgs e)
+        private static async void CheckEvent(object sender, ElapsedEventArgs e)
         {
-            CheckEventTime();
+            await CheckEventTime();
         }
 
 

@@ -63,7 +63,7 @@ namespace PhoenixBot.Guild_Accounts
                 EventRunning = false,
                 DayChecked = DateTime.Now,
                 DebateRunning = false,
-                StickHolder = 0
+                StickHolder = null
             };
             accounts.Add(newAccount);
             SaveAccounts();
