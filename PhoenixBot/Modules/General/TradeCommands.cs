@@ -22,13 +22,21 @@ namespace PhoenixBot.Modules.General
             var amount = howMany;
             var price = Price; */
             var postChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.buyingTradeID);
-            var info = new TradeTransaction[5]; //{user, TransactionType.Buy, item, amount, price };
-            info[0].trader = (SocketGuildUser)Context.User;
+            var info = new TradeTransaction
+            { //{user, TransactionType.Buy, item, amount, price };
+                trader = (SocketGuildUser)Context.User,
+            transactionType = TransactionType.Buy,
+            item = itemName,
+            amount = howMany,
+            price = Price };
+        TradeLists.tradeInfo.Add(info);
+            TradeLists.SaveTradeList();
+            /*info[0].trader = (SocketGuildUser)Context.User;
             info[1].transactionType = TransactionType.Buy;
             info[2].item = itemName;
             info[3].amount = howMany;
             info[4].price = Price;
-            TradeLists.tradeInfo.Add(info);
+            TradeLists.tradeInfo.Add(info);*/
             TradeLists.SaveTradeList();
             await postChannel.SendMessageAsync("Post created.");
         }
@@ -36,12 +44,14 @@ namespace PhoenixBot.Modules.General
         public async Task SellTrade(string itemName, uint howMany, [Remainder] string Price)
         {
             var postChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.sellingTradeID);
-            var info = new TradeTransaction[5];
-            info[5].trader = (SocketGuildUser)Context.User;
-            info[5].transactionType = TransactionType.Sell;
-            info[5].item = itemName;
-            info[5].amount = howMany;
-            info[5].price = Price;
+            var info = new TradeTransaction
+            { //{user, TransactionType.Buy, item, amount, price };
+                trader = (SocketGuildUser)Context.User,
+                transactionType = TransactionType.Buy,
+                item = itemName,
+                amount = howMany,
+                price = Price
+            };
             TradeLists.tradeInfo.Add(info);
             TradeLists.SaveTradeList();
             await postChannel.SendMessageAsync("Post created.");
@@ -55,13 +65,13 @@ namespace PhoenixBot.Modules.General
             embed.WithTitle("Buying Trade:");
             foreach(var trade in TradeLists.tradeInfo)
             {
-                if(trade[5].transactionType == wanted)
+                if(trade.transactionType == wanted)
                 {
                     embed.WithTitle($"{wanted} Trade:")
-                        .AddField("Trader:", trade[5].trader)
-                        .AddField("Item:", trade[5].item)
-                        .AddField("Amount:", trade[5].amount)
-                        .AddField("Price:", trade[5].price);
+                        .AddField("Trader:", trade.trader)
+                        .AddField("Item:", trade.item)
+                        .AddField("Amount:", trade.amount)
+                        .AddField("Price:", trade.price);
                     if(wanted == TransactionType.Buy)
                     {
                         await buyingChannel.SendMessageAsync("", false, embed);

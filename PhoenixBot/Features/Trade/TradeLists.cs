@@ -11,7 +11,7 @@ namespace PhoenixBot.Features.Trade
     public static class TradeLists
     {
         //WIP
-        public static List<TradeTransaction[]> tradeInfo;
+        public static List<TradeTransaction> tradeInfo;
         private static string tradeListFile = "Resources/tradeInfoList.json";
 
 
@@ -24,7 +24,7 @@ namespace PhoenixBot.Features.Trade
             }
             else
             {
-                tradeInfo = new List<TradeTransaction[]>();
+                tradeInfo = new List<TradeTransaction>();
                 SaveTradeList();
             }
 
