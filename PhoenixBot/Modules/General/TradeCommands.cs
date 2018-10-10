@@ -3,9 +3,79 @@ using System.Threading.Tasks;
 using Discord.Commands;
 using Discord;
 using Discord.WebSocket;
+using PhoenixBot.Features.Trade;
 
 namespace PhoenixBot.Modules.General
 {
+    [Group("Trade")]
+    [Cooldown(10)]
+    public class TradeCommands : ModuleBase<SocketCommandContext>
+    {
+        //private TransactionType selling;
+        //private TransactionType buying;
+
+        [Command("buy")]
+        public async Task BuyTrade(string itemName, uint howMany, [Remainder] string Price)
+        {
+            /*SocketGuildUser user = (SocketGuildUser)Context.User;
+            var item = itemName;
+            var amount = howMany;
+            var price = Price; */
+            var postChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.buyingTradeID);
+            var info = new TradeTransaction[5]; //{user, TransactionType.Buy, item, amount, price };
+            info[5].trader = (SocketGuildUser)Context.User;
+            info[5].transactionType = TransactionType.Buy;
+            info[5].item = itemName;
+            info[5].amount = howMany;
+            info[5].price = Price;
+            TradeLists.tradeInfo.Add(info);
+            TradeLists.SaveTradeList();
+            await postChannel.SendMessageAsync("Post created.");
+        }
+        [Command("sell")]
+        public async Task SellTrade(string itemName, uint howMany, [Remainder] string Price)
+        {
+            var postChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.sellingTradeID);
+            var info = new TradeTransaction[5];
+            info[5].trader = (SocketGuildUser)Context.User;
+            info[5].transactionType = TransactionType.Sell;
+            info[5].item = itemName;
+            info[5].amount = howMany;
+            info[5].price = Price;
+            TradeLists.tradeInfo.Add(info);
+            TradeLists.SaveTradeList();
+            await postChannel.SendMessageAsync("Post created.");
+        }
+        [Command("list")]
+        public async Task ListTrades(TransactionType wanted)
+        {
+            var buyingChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.buyingTradeID);
+            var sellingChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.sellingTradeID);
+            var embed = new EmbedBuilder();
+            embed.WithTitle("Buying Trade:");
+            foreach(var trade in TradeLists.tradeInfo)
+            {
+                if(trade[5].transactionType == wanted)
+                {
+                    embed.WithTitle($"{wanted} Trade:")
+                        .AddField("Trader:", trade[5].trader)
+                        .AddField("Item:", trade[5].item)
+                        .AddField("Amount:", trade[5].amount)
+                        .AddField("Price:", trade[5].price);
+                    if(wanted == TransactionType.Buy)
+                    {
+                        await buyingChannel.SendMessageAsync("", false, embed);
+                    }
+                    if (wanted == TransactionType.Buy)
+                    {
+                        await sellingChannel.SendMessageAsync("", false, embed);
+                    }
+                }
+            }
+        }
+    }
+
+    /* Works but errored out for the WIP Features -> Trade Files.
     [Group("Trade")]
     [Cooldown(5)]
     public class TradeCommands : ModuleBase<SocketCommandContext>
@@ -55,5 +125,5 @@ namespace PhoenixBot.Modules.General
             }
         }
 
-    }
+    }*/
 }
