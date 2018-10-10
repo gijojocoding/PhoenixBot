@@ -23,11 +23,11 @@ namespace PhoenixBot.Modules.General
             var price = Price; */
             var postChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.buyingTradeID);
             var info = new TradeTransaction[5]; //{user, TransactionType.Buy, item, amount, price };
-            info[5].trader = (SocketGuildUser)Context.User;
-            info[5].transactionType = TransactionType.Buy;
-            info[5].item = itemName;
-            info[5].amount = howMany;
-            info[5].price = Price;
+            info[0].trader = (SocketGuildUser)Context.User;
+            info[1].transactionType = TransactionType.Buy;
+            info[2].item = itemName;
+            info[3].amount = howMany;
+            info[4].price = Price;
             TradeLists.tradeInfo.Add(info);
             TradeLists.SaveTradeList();
             await postChannel.SendMessageAsync("Post created.");
