@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace PhoenixBot.Modules.Admin
 {
     [Group("Announcement")]
-    class Announcement : ModuleBase<SocketCommandContext>
+    public class Announcement : ModuleBase<SocketCommandContext>
     {
         [Command("tageveryone")]
         [Summary("Admin command, posts a message in the Announcement Channel with the `everyone` tag.")]
@@ -27,7 +27,7 @@ namespace PhoenixBot.Modules.Admin
             var announcementEmbed = new EmbedBuilder();
             announcementEmbed.WithTitle("**ANNOUNCEMENT FOR ALL GUILD MEMBERS**")
             .WithDescription(message);
-            await announcements.SendMessageAsync("@everyone", false, announcementEmbed);
+            await announcements.SendMessageAsync("@here", false, announcementEmbed);
         }
         [Command("triva")]
         [Summary("Admin command, picks a random fact then posts it in the general channel.")]

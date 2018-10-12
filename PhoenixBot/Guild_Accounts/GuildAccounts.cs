@@ -55,6 +55,7 @@ namespace PhoenixBot.Guild_Accounts
             var newAccount = new GuildAccount()
             {
                 ID = id,
+                NumberOfTempChannels = 0,
                 PointsForHealthIncrease = 500,
                 PointsForHealth = 50,
                 PointsForRevive = 20,

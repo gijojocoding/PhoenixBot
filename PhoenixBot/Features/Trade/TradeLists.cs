@@ -37,7 +37,25 @@ namespace PhoenixBot.Features.Trade
         {
             TradeDataStorage.LoadTradeList(tradeListFile);
         }
+        public static TradeTransaction GetTrade(SocketGuildUser user)
+        {
+            return CreateTrade(user);
+        }
+        public static TradeTransaction CreateTrade(SocketGuildUser user)
+        {
+            var newTrade = new TradeTransaction()
+            {
+                trader = user,
+                transactionType = TransactionType.none,
+                item = "null",
+                amount = 0,
+                price = "null"
 
+            };
+            tradeInfo.Add(newTrade);
+            SaveTradeList();
+            return newTrade;
 
+        }
     }
 }

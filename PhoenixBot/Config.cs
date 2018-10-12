@@ -52,12 +52,14 @@ namespace PhoenixBot
         public ulong muteLogID;
         public ulong banKickLogID;
         public ulong changeLogID;
-        //Guild Voice Channel ID(s)
-        public ulong DebateID;
         //Guild Role ID(s)
         public ulong generalID;
         public ulong applicantID;
         public ulong diplomatID;
         public ulong memberID;
+        //Guild Debate Channel ID(s)
+        public ulong debateVCID;
+        public ulong debateTCID;
+
     }
 }

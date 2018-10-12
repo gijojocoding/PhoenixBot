@@ -8,6 +8,7 @@ namespace PhoenixBot
     public class GuildAccount
     {
         public ulong ID { get; set; }
+        public int NumberOfTempChannels { get; set; }
         // Points needed to increase these stats
         public uint PointsForHealthIncrease { get; set; }
         public uint PointsForHealth { get; set; }

@@ -6,13 +6,12 @@ namespace PhoenixBot.Features
     {
         public static string CallRandomFact()
         {
-            int ListSize = Features.Facts.FactStorage.AmountOfFacts();
-            string Fact;
+            int ListSize = Facts.FactStorage.AmountOfFacts();
             Random call = new Random();
             int Call = call.Next(1, ListSize);
             var FactNumber = NumberToWords(Call);
-            var fact = Features.Facts.FactStorage.GetFacts(FactNumber);
-            return fact;
+            string factCalled = Facts.FactStorage.GetFacts(FactNumber);
+            return factCalled;
         }
         public static string NumberToWords(int number)
         {

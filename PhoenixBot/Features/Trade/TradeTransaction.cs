@@ -17,6 +17,7 @@ namespace PhoenixBot.Features.Trade
     public enum TransactionType
     {
         Sell,
-        Buy
+        Buy, 
+        none
     }
 }

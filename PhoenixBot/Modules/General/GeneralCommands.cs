@@ -104,5 +104,16 @@ namespace PhoenixBot.Modules.General
             }
             await Context.Channel.SendMessageAsync($"Event {GuildAccounts.GetAccount(Context.Guild).EventName} starts in {EventDays} day(s),{EventHours} hour(s), {EventMinutes} minute(s) and {EventSeconds} seconds(s)! ");
         }
+        [Command("Tokens")]
+        [Summary("Gives info about the tokens in the game.")]
+        public async Task Tokens()
+        {
+            var embed = new EmbedBuilder();
+            embed.WithTitle("**TOKENS**")
+                .WithDescription("At the time of writing this version of the code, we do not know all of how the tokens can be used.")
+                .AddField("Village Tokens:", "When given to the leader of the town, can be used to help the town.")
+                .AddField("Guild Tokens:", "When given to the Guild Master, can be used to help the guild.");
+            await ReplyAsync("", false, embed);
+        }
     }
 }
