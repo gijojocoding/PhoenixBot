@@ -35,7 +35,7 @@ namespace PhoenixBot.Modules.Owner
                 .AddField("Clerk:", clerk)
                 .AddField("Diplomat:", diplomat)
                 .AddField("Applicant:", applicant);
-            await Context.Channel.SendMessageAsync("", false, embed);
+            await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
         [Command("IDCheck", RunMode = RunMode.Async)]
         [RequireOwner]
@@ -46,30 +46,30 @@ namespace PhoenixBot.Modules.Owner
             await user.SendMessageAsync($"Context Guild ID: {Context.Guild.Id}");
             await user.SendMessageAsync($"Config Guild ID: {Config.bot.guildID}");
             await Task.Delay(1000);
-            await Guild.GetTextChannel(Config.bot.announcementID).SendMessageAsync($"Channel ID: {Config.bot.announcementID}");
-            await Guild.GetTextChannel(Config.bot.miniGameID).SendMessageAsync($"Channel ID: {Config.bot.miniGameID}");
+            await Guild.GetTextChannel(ChannelIds.channels.announcementID).SendMessageAsync($"Channel ID: {ChannelIds.channels.announcementID}");
+            await Guild.GetTextChannel(ChannelIds.channels.miniGameID).SendMessageAsync($"Channel ID: {ChannelIds.channels.miniGameID}");
             await Task.Delay(1000);
-            await Guild.GetTextChannel(Config.bot.tradeRequestID).SendMessageAsync($"Channel ID: {Config.bot.tradeRequestID}");
-            await Guild.GetTextChannel(Config.bot.buyingTradeID).SendMessageAsync($"Channel ID: {Config.bot.buyingTradeID}");
+            await Guild.GetTextChannel(ChannelIds.channels.tradeRequestID).SendMessageAsync($"Channel ID: {ChannelIds.channels.tradeRequestID}");
+            await Guild.GetTextChannel(ChannelIds.channels.buyingTradeID).SendMessageAsync($"Channel ID: {ChannelIds.channels.buyingTradeID}");
             await Task.Delay(1000);
-            await Guild.GetTextChannel(Config.bot.sellingTradeID).SendMessageAsync($"Channel ID: {Config.bot.sellingTradeID}");
-            await Guild.GetTextChannel(Config.bot.eventID).SendMessageAsync($"Channel ID: {Config.bot.eventID}");
+            await Guild.GetTextChannel(ChannelIds.channels.sellingTradeID).SendMessageAsync($"Channel ID: {ChannelIds.channels.sellingTradeID}");
+            await Guild.GetTextChannel(ChannelIds.channels.eventID).SendMessageAsync($"Channel ID: {ChannelIds.channels.eventID}");
             await Task.Delay(1000);
-            await Guild.GetTextChannel(Config.bot.staffCommandID).SendMessageAsync($"Channel ID: {Config.bot.staffCommandID}");
-            await Guild.GetTextChannel(Config.bot.adminLogID).SendMessageAsync($"Channel ID: {Config.bot.adminLogID}");
+            await Guild.GetTextChannel(ChannelIds.channels.staffCommandID).SendMessageAsync($"Channel ID: {ChannelIds.channels.staffCommandID}");
+            await Guild.GetTextChannel(ChannelIds.channels.adminLogID).SendMessageAsync($"Channel ID: {ChannelIds.channels.adminLogID}");
             await Task.Delay(1000);
-            await Guild.GetTextChannel(Config.bot.diplomatLogID).SendMessageAsync($"Channel ID: {Config.bot.diplomatLogID}");
-            await Guild.GetTextChannel(Config.bot.warningLogID).SendMessageAsync($"Channel ID: {Config.bot.warningLogID}");
+            await Guild.GetTextChannel(ChannelIds.channels.diplomatLogID).SendMessageAsync($"Channel ID: {ChannelIds.channels.diplomatLogID}");
+            await Guild.GetTextChannel(ChannelIds.channels.warningLogID).SendMessageAsync($"Channel ID: {ChannelIds.channels.warningLogID}");
             await Task.Delay(1000);
-            await Guild.GetTextChannel(Config.bot.messageLogID).SendMessageAsync($"Channel ID: {Config.bot.messageLogID}");
-            await Guild.GetTextChannel(Config.bot.muteLogID).SendMessageAsync($"Channel ID: {Config.bot.muteLogID}");
+            await Guild.GetTextChannel(ChannelIds.channels.messageLogID).SendMessageAsync($"Channel ID: {ChannelIds.channels.messageLogID}");
+            await Guild.GetTextChannel(ChannelIds.channels.muteLogID).SendMessageAsync($"Channel ID: {ChannelIds.channels.muteLogID}");
             await Task.Delay(1000);
-            await Guild.GetTextChannel(Config.bot.banKickLogID).SendMessageAsync($"Channel ID: {Config.bot.banKickLogID}");
+            await Guild.GetTextChannel(ChannelIds.channels.banKickLogID).SendMessageAsync($"Channel ID: {ChannelIds.channels.banKickLogID}");
             await Task.Delay(1000);
             await Context.Channel.SendMessageAsync("Command has finished.");
         }
         [Command("GuildDetails")]
-        [Summary("")]
+        [Summary("Gives server details about the server")]
         [RequireOwner]
         public async Task GetGuildDetails([Remainder] string info = "")
         {
@@ -91,8 +91,8 @@ namespace PhoenixBot.Modules.Owner
                 .AddField("AFK Timer:", afkTimer)
                 .AddField("AFK Channel:", afkChannel)
                 .WithColor(30, 60, 120);
-                var ChannelToPostTo = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.generalID);
-                await ChannelToPostTo.SendMessageAsync("", false, embed);
+                var ChannelToPostTo = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.generalID);
+                await ChannelToPostTo.SendMessageAsync("", false, embed.Build());
                 return;
             }
             else if (info == "" || info == " ")
@@ -105,7 +105,7 @@ namespace PhoenixBot.Modules.Owner
                 .AddField("AFK Timer:", afkTimer)
                 .AddField("AFK Channel:", afkChannel)
                 .WithColor(30, 60, 120);
-                await Context.Channel.SendMessageAsync("", false, embed);
+                await Context.Channel.SendMessageAsync("", false, embed.Build());
                 return;
             }
             else if (info == "Membercount")

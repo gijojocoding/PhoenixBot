@@ -30,7 +30,7 @@ namespace PhoenixBot
             }
         }
 
-        public override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider services)
+        public override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider _provider)
         {
             if (!AdminsAreLimited && context.User is IGuildUser user && user.GuildPermissions.Administrator)
             {

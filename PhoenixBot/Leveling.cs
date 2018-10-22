@@ -29,7 +29,7 @@ namespace PhoenixBot.LevelingSystem
                 var embed = new EmbedBuilder();
                 embed.WithTitle("Level Up")
                     .WithDescription($"{user.Mention} **JUST LEVELED UP! THEY ARE NOW {userAccount.LevelNumber}!** They got {pointsAdded} points!");
-                channel.SendMessageAsync("", false, embed);
+                channel.SendMessageAsync("", false, embed.Build());
             }
         }
     }

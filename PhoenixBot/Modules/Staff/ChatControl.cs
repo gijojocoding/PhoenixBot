@@ -13,7 +13,7 @@ namespace PhoenixBot.Modules.Staff
         [Summary("Staff Command, used stop a person from sending messages. **DO NOT ABUSE THE COMMAND!**")]
         public async Task Mute(IGuildUser user, [Remainder]string reason)
         {
-            var muteLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.muteLogID);
+            var muteLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.muteLogID);
             SocketUser target = null;
             var mentionedUser = Context.Message.MentionedUsers.FirstOrDefault();
             target = mentionedUser;
@@ -41,7 +41,7 @@ namespace PhoenixBot.Modules.Staff
         [Summary("Staff command, used to allow people to send messages if muted.")]
         public async Task UnMute(IGuildUser user)
         {
-            var muteLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.muteLogID);
+            var muteLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.muteLogID);
             SocketUser target = null;
             var mentionedUser = Context.Message.MentionedUsers.FirstOrDefault();
             target = mentionedUser;
@@ -62,9 +62,9 @@ namespace PhoenixBot.Modules.Staff
         }
         [Command("warn")]
         [Summary("Staff command, used to send a warning to a person. **DO NOT ABUSE THE COMMAND!**")]
-        public async Task warn(IGuildUser user, [Remainder] string reason)
+        public async Task Warn(IGuildUser user, [Remainder] string reason)
         {
-            var warnLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.warningLogID);
+            var warnLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.warningLogID);
             var dmChannel = await user.GetOrCreateDMChannelAsync();
             if (RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User))
             {
@@ -79,7 +79,7 @@ namespace PhoenixBot.Modules.Staff
         {
             if (RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) && (reason != null || reason != "" || reason != " "))
             {
-                var banKickLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.banKickLogID);
+                var banKickLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.banKickLogID);
                 var dmChannel = await user.GetOrCreateDMChannelAsync();
                 var target = user.Mention;
                 await dmChannel.SendMessageAsync($"It is with much debate and regret that we must inform you that you are banned from the server. The reason is: {reason}");
@@ -97,7 +97,7 @@ namespace PhoenixBot.Modules.Staff
         public async Task KickUser(IGuildUser user, [Remainder] string reason)
         {
             int deleteNumber = 1;
-            var banKickLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.banKickLogID);
+            var banKickLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.banKickLogID);
             var dmChannel = await user.GetOrCreateDMChannelAsync();
             if (RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User))
             {
@@ -110,18 +110,19 @@ namespace PhoenixBot.Modules.Staff
         [Command("purge")]
         [Summary("Staff command, used to delete the last series of messages.")]
         [RequireUserPermission(GuildPermission.ManageMessages)]
-        public async Task PurgeChat(int delnum, [Remainder] string reason)
+        public async Task PurgeChat(ulong delnum, [Remainder] string reason)
         {
-            var adminLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.adminLogID);
-            var messages = await Context.Channel.GetMessagesAsync(delnum + 1).Flatten();
-            await Context.Channel.DeleteMessagesAsync(messages);
+            var adminLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.adminLogID);
+            //var messages = await Context.Channel.GetMessagesAsync(delnum + 1).Flatten();
+            //await Context.Channel.DeleteMessagesAsync(messages);
+            await Context.Channel.DeleteMessageAsync(delnum + 1);
             await adminLog.SendMessageAsync($"{Context.User.Mention} deleted {delnum} for {reason}");
         }
         [Command("vmute")]
         [Summary("Staff command, used to mute")]
         public async Task VMute(IGuildUser user, [Remainder] string reason)
         {
-            var muteLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.muteLogID);
+            var muteLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.muteLogID);
             var dmchannel = await user.GetOrCreateDMChannelAsync();
             var deny = new OverwritePermissions(speak: PermValue.Deny, connect: PermValue.Allow);
             //var vChannels = Context.Guild.VoiceChannels;
@@ -134,13 +135,13 @@ namespace PhoenixBot.Modules.Staff
             embed.WithTitle("Voice Mute")
                 .AddField("Person issuing voice mute:", Context.User.Mention)
                 .AddField("Reason for the voice mute:", reason);
-            await muteLog.SendMessageAsync("", false, embed);
+            await muteLog.SendMessageAsync("", false, embed.Build());
             await dmchannel.SendMessageAsync($"You have been muted on all voice channels for: {reason}");
         }
         [Command("Vunmute")]
         public async Task VUnmute(IGuildUser user)
         {
-            var muteLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.muteLogID);
+            var muteLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.muteLogID);
             var dmchannel = await user.GetOrCreateDMChannelAsync();
             var allow = new OverwritePermissions(speak: PermValue.Allow, connect: PermValue.Allow);
             foreach (var vChannel in Context.Guild.VoiceChannels)

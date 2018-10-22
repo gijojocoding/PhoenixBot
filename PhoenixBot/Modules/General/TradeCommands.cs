@@ -14,7 +14,7 @@ namespace PhoenixBot.Modules.General
         [Summary("Posts an item your looking to buy in the `Buying` Channel.")]
         public async Task TradeRequest(string type, string itemName, string howMany, [Remainder] string price)
         {
-            if (Context.Message.Channel.Id == Config.bot.buyingTradeID)
+            if (Context.Message.Channel.Id == ChannelIds.channels.buyingTradeID)
             {
                 var buyEmbed = new EmbedBuilder();
                 buyEmbed.WithTitle("Buying Trade Request Info")
@@ -23,12 +23,12 @@ namespace PhoenixBot.Modules.General
                     .AddField("Qty:", $"{howMany}")
                     .AddField("Price:", $"{price}");
 
-                await Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.buyingTradeID).SendMessageAsync("", false, buyEmbed);
+                await Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.buyingTradeID).SendMessageAsync("", false, buyEmbed.Build());
             }
             else
             {
-                var messages = await Context.Channel.GetMessagesAsync(1).Flatten();
-                await Context.Channel.DeleteMessagesAsync(messages);
+                //var messages = await Context.Channel.GetMessagesAsync(1).Flatten();
+                await Context.Channel.DeleteMessageAsync(1);
                 await Context.Channel.SendMessageAsync("404 Wrong channel. Please post in the Trade Request Cahnnel.");
             }
         }
@@ -36,7 +36,7 @@ namespace PhoenixBot.Modules.General
         [Summary("Posts an item your looking to sell in the `Selling` Channel.")]
         public async Task SellRequest(string type, string itemName, string howMany, [Remainder] string price)
         {
-            if (Context.Message.Channel.Id != Config.bot.tradeRequestID)
+            if (Context.Message.Channel.Id == ChannelIds.channels.tradeRequestID)
             {
                 var sellEmbed = new EmbedBuilder();
                 sellEmbed.WithTitle("Selling Trade Request Info")
@@ -45,12 +45,12 @@ namespace PhoenixBot.Modules.General
                     .AddField("Qty:", $"{howMany}")
                     .AddField("Price:", $"{price}");
 
-                await Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.sellingTradeID).SendMessageAsync("", false, sellEmbed);
+                await Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.sellingTradeID).SendMessageAsync("", false, sellEmbed.Build());
             }
             else
             {
-                var messages = await Context.Channel.GetMessagesAsync(1).Flatten();
-                await Context.Channel.DeleteMessagesAsync(messages);
+                //var messages = await Context.Channel.GetMessagesAsync(1).Flatten();
+                await Context.Channel.DeleteMessageAsync(1);
                 await Context.Channel.SendMessageAsync("404 Wrong channel. Please post in the Trade Request Cahnnel.");
 
             }

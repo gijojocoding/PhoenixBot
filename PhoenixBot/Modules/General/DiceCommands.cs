@@ -17,7 +17,7 @@ namespace PhoenixBot.Modules.General
             int TossOne = DiceGame.Roll();
             int TossTwo = DiceGame.Roll();
             int Total = TossOne + TossTwo;
-            var gameChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.miniGameID);
+            var gameChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.miniGameID);
             var embed = new EmbedBuilder();
             if (Global.PlayerOneRoll == 0 || Global.PlayerTwoRoll == 0)
             {
@@ -26,7 +26,7 @@ namespace PhoenixBot.Modules.General
                     embed.WithTitle($"Dice have been Rolled!")
                         .AddField("The dice are:", $"Dice one: {TossOne}! Dice two: {TossTwo}!")
                         .AddField($"{Context.User} has rolled:", Total);
-                    await gameChannel.SendMessageAsync("", false, embed);
+                    await gameChannel.SendMessageAsync("", false, embed.Build());
                     Global.PlayerOneId = Context.User as SocketGuildUser;
                     Global.PlayerOneRoll = Total;
 
@@ -36,7 +36,7 @@ namespace PhoenixBot.Modules.General
                     embed.WithTitle($"Dice have been Rolled!")
                         .AddField("The dice are:", $"Dice one: {TossOne}! Dice two: {TossTwo}!")
                         .AddField($"{Context.User} has rolled:", Total);
-                    await gameChannel.SendMessageAsync("", false, embed);
+                    await gameChannel.SendMessageAsync("", false, embed.Build());
                     Global.PlayerTwoId = Context.User as SocketGuildUser;
                     Global.PlayerTwoRoll = Total;
                 }
@@ -48,7 +48,7 @@ namespace PhoenixBot.Modules.General
         }
         private async Task DiceGameFinish()
         {
-            var gameChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.miniGameID);
+            var gameChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.miniGameID);
             int PlayerOneComp = Math.Abs(Global.PlayerOneRoll - GoalNumber);
             var PlayerOne = Global.PlayerOneId;
             int PlayerTwoComp = Math.Abs(Global.PlayerTwoRoll - GoalNumber);
@@ -69,7 +69,7 @@ namespace PhoenixBot.Modules.General
                     .AddField($"{PlayerOne} had:", PlayerOneComp)
                     .AddField($"{PlayerTwo} had:", PlayerTwoComp);
             }
-            await gameChannel.SendMessageAsync("", false, embed);
+            await gameChannel.SendMessageAsync("", false, embed.Build());
             return;
         }
     }

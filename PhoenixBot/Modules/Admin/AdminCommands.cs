@@ -28,7 +28,7 @@ namespace PhoenixBot.Modules.Admin
                 var embed = new EmbedBuilder();
                 embed.WithTitle("Level Up")
                     .WithDescription($"{user.Mention} **JUST LEVELED UP! THEY ARE NOW {userAccount.LevelNumber}!** They got {pointsAdded} feathers!");
-                await Context.Channel.SendMessageAsync("", false, embed);
+                await Context.Channel.SendMessageAsync("", false, embed.Build());
             }
         }
         [Command("RemoveXp")]
@@ -52,19 +52,18 @@ namespace PhoenixBot.Modules.Admin
         [Command("adminpurge")]
         [Summary("Admin command, deletes a set of messages. no log created.")]
         [RequireUserPermission(GuildPermission.Administrator)]
-        public async Task AdminPurgeChat(int delnum)
+        public async Task AdminPurgeChat(ulong delnum)
         {
-            var messages = await Context.Channel.GetMessagesAsync(delnum + 1).Flatten();
-            await Context.Channel.DeleteMessagesAsync(messages);
+            //var messages = await Context.Channel.GetMessagesAsync(delnum + 1).Flatten();
+            await Context.Channel.DeleteMessageAsync(delnum + 1);
         }
         [Command("ChangeLog")]
         [Summary("Posts the Change Log of the most recent changes.")]
         [RequireOwner]
         public async Task ChangeLogCMD()
         {
-            var message = await Context.Channel.GetMessagesAsync(1).Flatten();
-            await Context.Channel.DeleteMessagesAsync(message);
-            var postingChannel = Global.Client.GetGuild(Context.Guild.Id).GetTextChannel(Config.bot.changeLogID);
+            await Context.Channel.DeleteMessageAsync(1);
+            var postingChannel = Global.Client.GetGuild(Context.Guild.Id).GetTextChannel(ChannelIds.channels.changeLogID);
             var embed = new EmbedBuilder();
             var planned = new EmbedBuilder();
             embed.WithTitle($"The change log for version {ChangeLog.log.Version}")
@@ -77,8 +76,8 @@ namespace PhoenixBot.Modules.Admin
                 .AddField("Planned:", ChangeLog.log.Planned1)
                 .AddField("Planned:", ChangeLog.log.Planned2)
                 .AddField("Planned:", ChangeLog.log.Planned3);
-            await postingChannel.SendMessageAsync("", false, embed);
-            await postingChannel.SendMessageAsync("", false, planned);
+            await postingChannel.SendMessageAsync("", false, embed.Build());
+            await postingChannel.SendMessageAsync("", false, planned.Build());
         }
         [Command("SetRandomFactTime")]
         [Summary("Admin command, sets guild's current time.")]
@@ -98,7 +97,7 @@ namespace PhoenixBot.Modules.Admin
             var embed = new EmbedBuilder();
             embed.WithTitle("Random Fact for the day")
                 .WithDescription(Post);
-            await Context.Channel.SendMessageAsync("", false, embed);
+            await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
         [Command("Ping")]
         [Summary("Returns a pong.")]

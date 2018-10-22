@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Discord.WebSocket;
 using Discord.Commands;
 using Discord;
@@ -15,15 +13,16 @@ namespace PhoenixBot
     {
         DiscordSocketClient _client;
         CommandService _service;
+        public static IServiceProvider _provider;
 
         private ulong GuildId_ = Config.bot.guildID;
-        private ulong eventChannelID = Config.bot.eventID;
+        private ulong eventChannelID = ChannelIds.channels.eventID;
 
         public async Task InitializeAsynce(DiscordSocketClient client)
         {
             _client = client;
             _service = new CommandService();
-            await _service.AddModulesAsync(Assembly.GetEntryAssembly());
+            await _service.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             _client.MessageReceived += HandleCommandAsync;
             _client.UserJoined += UserJoined;
         }
@@ -35,7 +34,7 @@ namespace PhoenixBot
 
             var dmChannel = await user.GetOrCreateDMChannelAsync();
             await dmChannel.SendMessageAsync($"{user}, welcome to Digital Phoenix! Please read the Rules channel." +
-                $"If you represent a guild please enter `!Diplomat` in the joining channel. Thank you", false, dataEmbed);
+                $"If you represent a guild please enter `!Diplomat` in the joining channel. Thank you", false, dataEmbed.Build());
 
         }
 
@@ -66,7 +65,7 @@ namespace PhoenixBot
             if (msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos)
                 || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
-                var result = await _service.ExecuteAsync(context, argPos);
+                var result = await _service.ExecuteAsync(context, argPos, _provider);
 
                 if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
                 {
@@ -81,8 +80,8 @@ namespace PhoenixBot
                 .WithDescription($"{guild.Owner.Mention}: {user.Mention} is currently muted. At {msg.Timestamp} an appeal was made.")
                 .AddField("Appeal Message:", newMsg);
             var dmChannel = await user.GetOrCreateDMChannelAsync();
-            var logChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.messageLogID);
-            await logChannel.SendMessageAsync($"{user.Mention}", false, embed);
+            var logChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.messageLogID);
+            await logChannel.SendMessageAsync($"{user.Mention}", false, embed.Build());
             await dmChannel.SendMessageAsync("Please wait for the Guild Master to review your appeal. Messaging them will not help your case.");
         }
         /*private async Task FactPost(IGuild CurrentGuild)

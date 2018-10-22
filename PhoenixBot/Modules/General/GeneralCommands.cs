@@ -20,14 +20,14 @@ namespace PhoenixBot.Modules.General
             {
                 var user = Context.User as SocketGuildUser;
                 var dmChannel = await user.GetOrCreateDMChannelAsync();
-                await dmChannel.SendMessageAsync("", false, dataEmbed);
+                await dmChannel.SendMessageAsync("", false, dataEmbed.Build());
                 return;
             }
             else
             {
                 var user = target as SocketGuildUser;
                 var dmChannel = await user.GetOrCreateDMChannelAsync();
-                await dmChannel.SendMessageAsync("", false, dataEmbed);
+                await dmChannel.SendMessageAsync("", false, dataEmbed.Build());
             }
         }
         [Command("Stats")]
@@ -43,7 +43,7 @@ namespace PhoenixBot.Modules.General
                     .AddField("Points:", target.Points)
                     .AddField("HP Info:", $"{target.MaxHp} / {target.HP}");
 
-                await Context.Channel.SendMessageAsync($"{user.Mention}", false, embed);
+                await Context.Channel.SendMessageAsync($"{user.Mention}", false, embed.Build());
                 return;
             }
             else
@@ -55,7 +55,7 @@ namespace PhoenixBot.Modules.General
                     .AddField("Level:", target.LevelNumber)
                     .AddField("Points:", target.Points)
                     .AddField("HP Info:", $"Max HP: {target.MaxHp}! Current HP:{target.HP}");
-                await Context.Channel.SendMessageAsync($"{targetUser.Mention}", false, embed);
+                await Context.Channel.SendMessageAsync($"{targetUser.Mention}", false, embed.Build());
                 return;
             }
         }
@@ -69,7 +69,7 @@ namespace PhoenixBot.Modules.General
                 .AddField("This bot is made by:", "Jojo")
                 .AddField("The current version:", $"{ChangeLog.log.Version}")
                 .AddField("Command Prefix:", $"{Config.bot.cmdPrefix}");
-            await ReplyAsync("", false, embed);
+            await ReplyAsync("", false, embed.Build());
         }
         [Command("event")]
         [Summary("Posts info about the current running event.")]
@@ -113,7 +113,7 @@ namespace PhoenixBot.Modules.General
                 .WithDescription("At the time of writing this version of the code, we do not know all of how the tokens can be used.")
                 .AddField("Village Tokens:", "When given to the leader of the town, can be used to help the town.")
                 .AddField("Guild Tokens:", "When given to the Guild Master, can be used to help the guild.");
-            await ReplyAsync("", false, embed);
+            await ReplyAsync("", false, embed.Build());
         }
     }
 }

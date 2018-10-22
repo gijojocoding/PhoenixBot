@@ -37,29 +37,5 @@ namespace PhoenixBot
         public string cmdPrefix;
         //Guild ID
         public ulong guildID;
-        //Guild Text Channel ID(s)
-        public ulong announcementID;
-        public ulong miniGameID;
-        public ulong tradeRequestID;
-        public ulong buyingTradeID;
-        public ulong sellingTradeID;
-        public ulong eventID;
-        public ulong staffCommandID;
-        public ulong adminLogID;
-        public ulong diplomatLogID;
-        public ulong warningLogID;
-        public ulong messageLogID;
-        public ulong muteLogID;
-        public ulong banKickLogID;
-        public ulong changeLogID;
-        //Guild Role ID(s)
-        public ulong generalID;
-        public ulong applicantID;
-        public ulong diplomatID;
-        public ulong memberID;
-        //Guild Debate Channel ID(s)
-        public ulong debateVCID;
-        public ulong debateTCID;
-
     }
 }

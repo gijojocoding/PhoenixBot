@@ -9,7 +9,7 @@ namespace PhoenixBot.Features
     internal static class EventReminder
     {
         private static ulong GuildId_ = Config.bot.guildID;
-        private static ulong eventChannelID = Config.bot.eventID;
+        private static ulong eventChannelID = ChannelIds.channels.eventID;
 
         private static Timer eventTimer;
 
@@ -105,7 +105,7 @@ namespace PhoenixBot.Features
                 var embed = new EmbedBuilder();
                 embed.WithTitle("Random Post for the day!")
                     .WithDescription(number);
-                var channel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.generalID);
+                var channel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.generalID);
                 await channel.SendMessageAsync("", false, embed);
                 guild.DayChecked = DateTime.Now;
                 Guild_Accounts.GuildAccounts.SaveAccounts();

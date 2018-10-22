@@ -21,7 +21,7 @@ namespace PhoenixBot.Modules.Staff
                 return;
             }
             var target = user;
-            var messageLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.messageLogID);
+            var messageLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.messageLogID);
             var dmChannel = await target.GetOrCreateDMChannelAsync();
             await dmChannel.SendMessageAsync($"This is a message from the discord server saying: {message}");
             await messageLog.SendMessageAsync($"{Context.User.Mention} sent a message to {target.Mention}. Message was: {message}");

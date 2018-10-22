@@ -15,7 +15,7 @@ namespace PhoenixBot.Modules
             if (!RoleCheck.HasClerkRole((SocketGuildUser)Context.User) && !RoleCheck.HasDiplomatRole((SocketGuildUser)Context.User))
             {
                 var guildUser = Context.User as IGuildUser;
-                var memberRole = Context.Guild.GetRole(Config.bot.applicantID);
+                var memberRole = Context.Guild.GetRole(RoleIds.roles.applicantID);
                 await guildUser.AddRoleAsync(memberRole);
                 var user = Context.User;
                 await Context.Channel.SendMessageAsync($"{user.Mention} has agreed to the rules and is a {memberRole}");
@@ -26,7 +26,7 @@ namespace PhoenixBot.Modules
         [Summary("Staff/Recruiter command, used to give a person the Diplomat role and log who they are with.")]
         public async Task Diplomat(SocketGuildUser user, [Remainder] string guild)
         {
-            var diplomatLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(Config.bot.diplomatLogID);
+            var diplomatLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.diplomatLogID);
             if (RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) || RoleCheck.HasRecruiterRole((SocketGuildUser)Context.User))
             {
                 if (RoleCheck.HasClerkRole((SocketGuildUser)user))
@@ -35,7 +35,7 @@ namespace PhoenixBot.Modules
                     return;
                 }
                 var target = user as IGuildUser;
-                var memberRole = Context.Guild.GetRole(Config.bot.diplomatID);
+                var memberRole = Context.Guild.GetRole(RoleIds.roles.diplomatID);
                 await target.AddRoleAsync(memberRole);
                 await diplomatLog.SendMessageAsync($"{target.Mention} is from the {guild}");
             }
@@ -49,8 +49,8 @@ namespace PhoenixBot.Modules
                 if (RoleCheck.HasApplicantRole((SocketGuildUser)applicant))
                 {
                     var guildUser = applicant;
-                    var role = Context.Guild.GetRole(Config.bot.memberID);
-                    var oldRole = Context.Guild.GetRole(Config.bot.memberID);
+                    var role = Context.Guild.GetRole(RoleIds.roles.memberID);
+                    var oldRole = Context.Guild.GetRole(RoleIds.roles.memberID);
                     await guildUser.AddRoleAsync(role);
                     await guildUser.RemoveRoleAsync(oldRole);
                     await Context.Channel.SendMessageAsync($"{guildUser.Mention} now is a {role}! This was granted by {Context.User}");
