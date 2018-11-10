@@ -15,8 +15,10 @@ namespace PhoenixBot.User_Accounts
             string json = JsonConvert.SerializeObject(accounts);
             File.WriteAllText(filePath, json);
         }
+
         public static IEnumerable<UserAccount> LoadUserAccounts(string filePath)
         {
+            // Load data
             if (!File.Exists(filePath)) return null;
             string json = File.ReadAllText(filePath);
             return JsonConvert.DeserializeObject<List<UserAccount>>(json);

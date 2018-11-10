@@ -9,6 +9,12 @@ namespace PhoenixBot.Modules.Admin
 {
     public class AdminCommands : ModuleBase<SocketCommandContext>
     {
+        [Command("user")]
+        [RequireOwner]
+        public async Task UsernameCmd()
+        {
+            await ReplyAsync($"Context user: {Context.User} Context user ToString: {Context.User.ToString()} Context user username: {Context.User.Username}");
+        }
         [Command("AddXp")]
         [Summary("Admin command, adds xp to a user's account.")]
         [RequireOwner]
@@ -52,10 +58,16 @@ namespace PhoenixBot.Modules.Admin
         [Command("adminpurge")]
         [Summary("Admin command, deletes a set of messages. no log created.")]
         [RequireUserPermission(GuildPermission.Administrator)]
-        public async Task AdminPurgeChat(ulong delnum)
+        public async Task AdminPurgeChat(int delnum)
         {
             //var messages = await Context.Channel.GetMessagesAsync(delnum + 1).Flatten();
-            await Context.Channel.DeleteMessageAsync(delnum + 1);
+            var Msgs = await Context.Channel.GetMessagesAsync(delnum + 1).FlattenAsync();
+
+            foreach (IUserMessage Msg in Msgs)
+            {
+                await Msg.DeleteAsync();
+                await Task.Delay(1000);
+            }
         }
         [Command("ChangeLog")]
         [Summary("Posts the Change Log of the most recent changes.")]

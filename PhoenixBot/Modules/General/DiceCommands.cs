@@ -14,6 +14,7 @@ namespace PhoenixBot.Modules.General
         [Summary("Rolls the dice.")]
         public async Task RollDiceGame()
         {
+            if (Context.IsPrivate == true) return;
             int TossOne = DiceGame.Roll();
             int TossTwo = DiceGame.Roll();
             int Total = TossOne + TossTwo;

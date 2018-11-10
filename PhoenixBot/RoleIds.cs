@@ -37,7 +37,8 @@ namespace PhoenixBot
         public ulong generalID;
         public ulong applicantID;
         public ulong diplomatID;
-        public ulong memberID;
+        public ulong guildMemberID;
+        public ulong townMemberID;
 
     }
 }

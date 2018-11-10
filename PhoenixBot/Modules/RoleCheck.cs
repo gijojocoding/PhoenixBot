@@ -101,5 +101,20 @@ namespace PhoenixBot.Modules
             var targetRole = user.Guild.GetRole(roleID);
             return user.Roles.Contains(targetRole);
         }
+        public static bool HasTownMemberRole(SocketGuildUser user)
+        {
+            string targetRoleName = "Town Member";
+            var result = from r in user.Guild.Roles
+                         where r.Name == targetRoleName
+                         select r.Id;
+            ulong roleID = result.FirstOrDefault();
+            if (roleID == 0)
+            {
+                Console.WriteLine($"Error in finding the: {targetRoleName} role.");
+                return false;
+            }
+            var targetRole = user.Guild.GetRole(roleID);
+            return user.Roles.Contains(targetRole);
+        }
     }
 }

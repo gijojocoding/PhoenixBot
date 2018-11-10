@@ -17,6 +17,7 @@ namespace PhoenixBot.Modules.General
         [Summary("Used to collect your daily points.")]
         public async Task DailyClaim()
         {
+            if (Context.IsPrivate == true) return;
             var user = Context.User;
             var account = UserAccounts.GetAccount(user);
             var currentTime = DateTime.Now;

@@ -13,7 +13,7 @@ namespace PhoenixBot.Modules.Admin
     {
         [Command("Open", RunMode = RunMode.Async)]
         [Summary("Admin command to open the debate channels.")]
-        public async Task OpenDebate()
+        public async Task OpenDebate(string target = "guild")
         {
             if (!RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) || !RoleCheck.HasChiefRole((SocketGuildUser)Context.User) || Context.User.Id != Context.Guild.Owner.Id) return;
             var vAllow = new OverwritePermissions(speak: PermValue.Deny, connect: PermValue.Allow, readMessageHistory: PermValue.Allow);
@@ -22,10 +22,27 @@ namespace PhoenixBot.Modules.Admin
             var tDeny = new OverwritePermissions(connect: PermValue.Deny, readMessageHistory: PermValue.Deny, sendMessages: PermValue.Deny);
             var voiceChannel = Context.Guild.GetVoiceChannel(ChannelIds.channels.debateVCID);
             var textChannel = Context.Guild.GetTextChannel(ChannelIds.channels.debateTCID);
-            await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.memberID), vAllow);
+            if(target == "guild")
+            {
+                await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.guildMemberID), vAllow);
+                await textChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.guildMemberID), tAllow);
+            }
+            if (target == "town")
+            {
+                await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.townMemberID), vAllow);
+                await textChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.townMemberID), tAllow);
+            }
+            if (target == "all")
+            {
+                await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.guildMemberID), vAllow);
+                await textChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.guildMemberID), tAllow);
+                await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.townMemberID), vAllow);
+                await textChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.townMemberID), tAllow);
+            }
+            await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.guildMemberID), vAllow);
             await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, vDeny);
             await textChannel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, tDeny);
-            await textChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.memberID), tAllow);
+
             var guild = GuildAccounts.GetAccount(Context.Guild);
             Console.WriteLine(guild);
             guild.StickHolder = null;
@@ -55,9 +72,11 @@ namespace PhoenixBot.Modules.Admin
             var currentHolderID =  guild.StickHolder;
             var deny = new OverwritePermissions(speak: PermValue.Deny, connect: PermValue.Deny, readMessageHistory: PermValue.Deny);
             var tDeny = new OverwritePermissions(connect: PermValue.Deny, readMessageHistory: PermValue.Deny, sendMessages: PermValue.Deny);
-            await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.memberID), deny);
+            await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.guildMemberID), deny);
+            await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.townMemberID), deny);
             await textChannel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, tDeny);
-            await textChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.memberID), tDeny);
+            await textChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.guildMemberID), tDeny);
+            await textChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.townMemberID), tDeny);
             guild.DebateRunning = false;
             GuildAccounts.SaveAccounts();
         }

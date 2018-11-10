@@ -106,7 +106,7 @@ namespace PhoenixBot.Features
                 embed.WithTitle("Random Post for the day!")
                     .WithDescription(number);
                 var channel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.generalID);
-                await channel.SendMessageAsync("", false, embed);
+                await channel.SendMessageAsync("", false, embed.Build());
                 guild.DayChecked = DateTime.Now;
                 Guild_Accounts.GuildAccounts.SaveAccounts();
                 return;

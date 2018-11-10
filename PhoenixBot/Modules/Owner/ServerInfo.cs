@@ -22,7 +22,7 @@ namespace PhoenixBot.Modules.Owner
             string clerk = "Basic role given to guild members. The bread and butter of the guild. Without our Clerks, we have no guild.";
             string diplomat = "Members that represent other guilds for various reasons. **PEOPLE CAUGHT FROM OTHER GUILDS WITHOUT THIS ROLE ARE BANNED.**";
             string applicant = "New members who have agreed to the rules before being sorted into the Diplomat or Clerk roles. **This role is removed after being sorted.**";
-
+            string townMember = "These are members of the town.";
             var embed = new EmbedBuilder();
             embed.WithTitle("Role Info")
                 .WithDescription(info)
@@ -33,6 +33,7 @@ namespace PhoenixBot.Modules.Owner
                 .AddField("Trader:", trader)
                 .AddField("Traveling Trader:", travelingTrader)
                 .AddField("Clerk:", clerk)
+                .AddField("Town Member:", townMember)
                 .AddField("Diplomat:", diplomat)
                 .AddField("Applicant:", applicant);
             await Context.Channel.SendMessageAsync("", false, embed.Build());

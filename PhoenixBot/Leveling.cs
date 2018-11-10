@@ -7,7 +7,7 @@ using Discord.WebSocket;
 using PhoenixBot.User_Accounts;
 using Discord;
 
-namespace PhoenixBot.LevelingSystem
+namespace PhoenixBot
 {
     internal static class Leveling
     {
@@ -28,7 +28,7 @@ namespace PhoenixBot.LevelingSystem
                 //User Leveled Up
                 var embed = new EmbedBuilder();
                 embed.WithTitle("Level Up")
-                    .WithDescription($"{user.Mention} **JUST LEVELED UP! THEY ARE NOW {userAccount.LevelNumber}!** They got {pointsAdded} points!");
+                    .WithDescription($"{user.Mention} **JUST LEVELED UP! THEY ARE NOW {userAccount.LevelNumber}!** They got {pointsAdded} feahters!");
                 channel.SendMessageAsync("", false, embed.Build());
             }
         }

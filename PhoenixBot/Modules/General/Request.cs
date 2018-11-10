@@ -50,19 +50,38 @@ namespace PhoenixBot.Modules.General
         [Summary("Used to request a time to run a meeting.")]
         public async Task RequestMeeting(string topic, string when, string length)
         {
-            if (!RoleCheck.HasClerkRole((SocketGuildUser)Context.User))
+            if (!RoleCheck.HasClerkRole((SocketGuildUser)Context.User) || !RoleCheck.HasTownMemberRole((SocketGuildUser)Context.User))
             {
                 await Context.Channel.SendMessageAsync("**ERROR 404** You lack the role to use this command.");
                 return;
             }
             var embed = new EmbedBuilder();
-            embed.WithTitle("Voice Channel Request:")
+            embed.WithTitle("Meeting Request:")
                 .AddField("Who:", Context.User.Mention)
                 .AddField("Topic:", topic)
                 .AddField("When:", when)
                 .AddField("Length:", length);
             var requestChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.requestID);
             await requestChannel.SendMessageAsync("", false, embed.Build());
+        }
+        [Command("Event")]
+        [Summary("Used to request an event count down. Formate is: `MM/DD/YY HH:MM (In Central Time to make sure we can set the info to the proper time), and followed by what the event is for.")]
+        public async Task EventRequest(string Date, string time, [Remainder] string eventInfo)
+        {
+            if (!RoleCheck.HasClerkRole((SocketGuildUser)Context.User) || !RoleCheck.HasTownMemberRole((SocketGuildUser)Context.User))
+            {
+                await Context.Channel.SendMessageAsync("**ERROR 404** You lack the role to use this command.");
+                return;
+            }
+            var embed = new EmbedBuilder();
+            embed.WithTitle("Event Request")
+                .AddField("Who:", Context.User.Mention)
+                .AddField("For:", eventInfo)
+                .AddField("Date:", eventInfo)
+                .AddField("Time:", time);
+            await Context.Channel.SendMessageAsync("", false, embed.Build());
+
+
         }
         [Command("info")]
         [Summary("Sends a DM with info.")]

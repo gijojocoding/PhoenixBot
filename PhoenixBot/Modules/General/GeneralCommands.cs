@@ -34,6 +34,7 @@ namespace PhoenixBot.Modules.General
         [Summary("Gets the stats about the user, or the person tagged. ")]
         public async Task Stats(SocketGuildUser user = null)
         {
+            if (Context.IsPrivate == true) return;
             if (user != null)
             {
                 var target = User_Accounts.UserAccounts.GetAccount(user);
@@ -75,6 +76,7 @@ namespace PhoenixBot.Modules.General
         [Summary("Posts info about the current running event.")]
         public async Task EventStartsIn()
         {
+            if (Context.IsPrivate == true) return;
             var guild = Context.Guild;
             var currentGuild = GuildAccounts.GetAccount(guild);
             if (currentGuild.EventRunning == false)

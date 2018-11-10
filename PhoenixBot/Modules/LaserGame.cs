@@ -14,6 +14,7 @@ namespace PhoenixBot.Modules
         [Cooldown(10)]
         public async Task Laserz()
         {
+            if (Context.Channel.Id != ChannelIds.channels.miniGameID) return;
             await Context.Channel.SendMessageAsync($"PEW PEW");
             await Context.Channel.SendMessageAsync($"PEW PEW PEW PEW PEW");
             await Context.Channel.SendMessageAsync($"{Context.User} shot the laserz hitting nothing! They need to work on their aim!");
@@ -23,6 +24,7 @@ namespace PhoenixBot.Modules
         [Cooldown(15)]
         public async Task LaserTarget(IGuildUser user)
         {
+            if (Context.Channel.Id != ChannelIds.channels.miniGameID) return;
             var account = User_Accounts.UserAccounts.GetAccount(Context.User);
             SocketUser target = null;
             var mentionedUser = Context.Message.MentionedUsers.FirstOrDefault();
@@ -74,6 +76,7 @@ namespace PhoenixBot.Modules
         [Cooldown(10)]
         public async Task RevivePlayer(IGuildUser user)
         {
+            if (Context.Channel.Id != ChannelIds.channels.miniGameID) return;
             var account = User_Accounts.UserAccounts.GetAccount(Context.User);
             SocketUser target = null;
             var mentionedUser = Context.Message.MentionedUsers.FirstOrDefault();
@@ -120,6 +123,7 @@ namespace PhoenixBot.Modules
         [Cooldown(10)]
         public async Task SelfHeal(SocketGuildUser user)
         {
+            if (Context.Channel.Id != ChannelIds.channels.miniGameID) return;
             var cmdUser = Context.User as SocketGuildUser;
             SocketGuildUser target = user;
             if (cmdUser == target)

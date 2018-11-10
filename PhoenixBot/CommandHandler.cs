@@ -23,7 +23,7 @@ namespace PhoenixBot
             _client = client;
             _service = new CommandService();
             await _service.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
-            _client.MessageReceived += HandleCommandAsync;
+            _client.MessageReceived += PreCommandHandle;
             _client.UserJoined += UserJoined;
         }
         public async Task UserJoined(SocketGuildUser user)
@@ -38,7 +38,7 @@ namespace PhoenixBot
 
         }
 
-        private async Task HandleCommandAsync(SocketMessage s)
+        private async Task PreCommandHandle(SocketMessage s)
         {
             var msg = s as SocketUserMessage;
             if (msg == null) return;
@@ -47,11 +47,11 @@ namespace PhoenixBot
             // Mute check
             if (useraccount.IsMuted)
             {
-                if (msg.Content.Contains("!MuteAppeal"))
+                if (msg.Content.Contains("!Appeal mute"))
                 {
-                    var guild = context.Guild;
-                    var newMsg = msg.Content.Remove(0, 11);
-                    await Appeal((SocketGuildUser)context.User, newMsg, msg, guild);
+
+                    var newMsg = msg.Content.TrimStart((char)12);
+                    await Appeal((SocketGuildUser)context.User, newMsg, context.Guild);
                 }
                 await context.Message.DeleteAsync();
                 return;
@@ -59,8 +59,13 @@ namespace PhoenixBot
             //FactPost(context.Guild);
             //Leveling Logic
             if (context.User.IsBot) return;
-            LevelingSystem.Leveling.UserSentMessage((SocketGuildUser)context.User, (SocketTextChannel)context.Channel);
+            Leveling.UserSentMessage((SocketGuildUser)context.User, (SocketTextChannel)context.Channel);
+            await HandleCommandAsync(msg);
 
+        }
+        private async Task HandleCommandAsync(SocketUserMessage msg)
+        {
+            var context = new SocketCommandContext(_client, msg);
             int argPos = 0;
             if (msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos)
                 || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
@@ -73,14 +78,14 @@ namespace PhoenixBot
                 }
             }
         }
-        private async Task Appeal(SocketGuildUser user, string newMsg, SocketMessage msg, SocketGuild guild)
+        private async Task Appeal(SocketGuildUser user, string newMsg, SocketGuild guild)
         {
             var embed = new EmbedBuilder();
             embed.WithTitle("Mute Appeal")
-                .WithDescription($"{guild.Owner.Mention}: {user.Mention} is currently muted. At {msg.Timestamp} an appeal was made.")
+                .WithDescription($"{guild.Owner.Mention}: {user.Mention} is currently muted.")
                 .AddField("Appeal Message:", newMsg);
             var dmChannel = await user.GetOrCreateDMChannelAsync();
-            var logChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.messageLogID);
+            var logChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.requestID);
             await logChannel.SendMessageAsync($"{user.Mention}", false, embed.Build());
             await dmChannel.SendMessageAsync("Please wait for the Guild Master to review your appeal. Messaging them will not help your case.");
         }

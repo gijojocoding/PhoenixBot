@@ -12,6 +12,7 @@ namespace PhoenixBot.Modules
         [Summary("New people use this to agree to the server's Rules.")]
         public async Task AgreeToTheRules()
         {
+            if (Context.IsPrivate == true) return;
             if (!RoleCheck.HasClerkRole((SocketGuildUser)Context.User) && !RoleCheck.HasDiplomatRole((SocketGuildUser)Context.User))
             {
                 var guildUser = Context.User as IGuildUser;
@@ -26,6 +27,7 @@ namespace PhoenixBot.Modules
         [Summary("Staff/Recruiter command, used to give a person the Diplomat role and log who they are with.")]
         public async Task Diplomat(SocketGuildUser user, [Remainder] string guild)
         {
+            if (Context.IsPrivate == true) return;
             var diplomatLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.diplomatLogID);
             if (RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) || RoleCheck.HasRecruiterRole((SocketGuildUser)Context.User))
             {
@@ -40,20 +42,39 @@ namespace PhoenixBot.Modules
                 await diplomatLog.SendMessageAsync($"{target.Mention} is from the {guild}");
             }
         }
-        [Command("FullMember")]
-        [Summary("Staff/Recruiter command, used grant access to member channels.")]
-        public async Task GrantFullMemberShip(IGuildUser applicant)
+        [Command("GuildMember")]
+        [Summary("Staff/Recruiter command, used to grant access to guild channels.")]
+        public async Task GrantGuildMembership(IGuildUser applicant)
         {
+            if (Context.IsPrivate == true) return;
             if (RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) || RoleCheck.HasRecruiterRole((SocketGuildUser)Context.User))
             {
-                if (RoleCheck.HasApplicantRole((SocketGuildUser)applicant))
+                if (RoleCheck.HasApplicantRole((SocketGuildUser)applicant) && !RoleCheck.HasDiplomatRole((SocketGuildUser)applicant))
                 {
                     var guildUser = applicant;
-                    var role = Context.Guild.GetRole(RoleIds.roles.memberID);
-                    var oldRole = Context.Guild.GetRole(RoleIds.roles.memberID);
+                    var role = Context.Guild.GetRole(RoleIds.roles.guildMemberID);
+                    var oldRole = Context.Guild.GetRole(RoleIds.roles.applicantID);
                     await guildUser.AddRoleAsync(role);
                     await guildUser.RemoveRoleAsync(oldRole);
-                    await Context.Channel.SendMessageAsync($"{guildUser.Mention} now is a {role}! This was granted by {Context.User}");
+                    await Context.Channel.SendMessageAsync($"{guildUser.Mention} now has the `{role}` role! This was granted by {Context.User}");
+                }
+            }
+        }
+        [Command("TownMember")]
+        [Summary("Staff/Recruiter command, used to grand access to town channels.")]
+        public async Task GrantTownMembership(IGuildUser applicant)
+        {
+            if (Context.IsPrivate == true) return;
+            if (RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) || RoleCheck.HasRecruiterRole((SocketGuildUser)Context.User))
+            {
+                if (RoleCheck.HasApplicantRole((SocketGuildUser)applicant) && !RoleCheck.HasDiplomatRole((SocketGuildUser)applicant))
+                {
+                    var guildUser = applicant;
+                    var role = Context.Guild.GetRole(RoleIds.roles.guildMemberID);
+                    var oldRole = Context.Guild.GetRole(RoleIds.roles.applicantID);
+                    await guildUser.AddRoleAsync(role);
+                    await guildUser.RemoveRoleAsync(oldRole);
+                    await Context.Channel.SendMessageAsync($"{guildUser.Mention} now has the `{role}` role! This was granted by {Context.User}");
                 }
             }
         }

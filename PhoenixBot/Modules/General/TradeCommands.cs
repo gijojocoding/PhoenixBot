@@ -2,19 +2,20 @@
 using System.Threading.Tasks;
 using Discord.Commands;
 using Discord;
+using Discord.WebSocket;
+using PhoenixBot.Features.Trade;
 
 namespace PhoenixBot.Modules.General
 {
-
-    [Group("Trade")]
+    //[Group("Trade")]
     [Cooldown(5)]
     public class TradeCommands : ModuleBase<SocketCommandContext>
     {
         [Command("Buy")]
         [Summary("Posts an item your looking to buy in the `Buying` Channel.")]
-        public async Task TradeRequest(string type, string itemName, string howMany, [Remainder] string price)
+        public async Task TradeRequest(string itemName, string howMany, [Remainder] string price)
         {
-            if (Context.Message.Channel.Id == ChannelIds.channels.buyingTradeID)
+            if (Context.Message.Channel.Id == ChannelIds.channels.tradeRequestID)
             {
                 var buyEmbed = new EmbedBuilder();
                 buyEmbed.WithTitle("Buying Trade Request Info")
@@ -29,12 +30,12 @@ namespace PhoenixBot.Modules.General
             {
                 //var messages = await Context.Channel.GetMessagesAsync(1).Flatten();
                 await Context.Channel.DeleteMessageAsync(1);
-                await Context.Channel.SendMessageAsync("404 Wrong channel. Please post in the Trade Request Cahnnel.");
+                await Context.Channel.SendMessageAsync("Error 404: Wrong channel. Please post in the Trade Request Cahnnel.");
             }
         }
         [Command("Sell")]
         [Summary("Posts an item your looking to sell in the `Selling` Channel.")]
-        public async Task SellRequest(string type, string itemName, string howMany, [Remainder] string price)
+        public async Task SellRequest(string itemName, string howMany, [Remainder] string price)
         {
             if (Context.Message.Channel.Id == ChannelIds.channels.tradeRequestID)
             {
@@ -51,9 +52,56 @@ namespace PhoenixBot.Modules.General
             {
                 //var messages = await Context.Channel.GetMessagesAsync(1).Flatten();
                 await Context.Channel.DeleteMessageAsync(1);
-                await Context.Channel.SendMessageAsync("404 Wrong channel. Please post in the Trade Request Cahnnel.");
+                await Context.Channel.SendMessageAsync("Error 404: Wrong channel. Please post in the Trade Request Cahnnel.");
 
             }
         }
+        [Command("tBuy"), Alias("tb")]
+        public async Task TestBuy(string Item, string Amount, [Remainder] string Price)
+        {
+            Console.WriteLine("Command recieved.");
+            var poster = Context.User.ToString();
+            var trade = TradeLists.GetTrade(poster);
+            trade.transactionType = TransactionType.Buy;
+            trade.item = Item;
+            trade.amount = Amount;
+            trade.price = Price;
+            TradeLists.tradeInfo.Add(trade);
+            TradeLists.SaveTradeList();
+            await Context.Channel.SendMessageAsync($"Your trade has been added.");
+        }
+        [Command("tSell"), Alias("ts")]
+        public async Task TestSell(string Item, string Amount, [Remainder] string Price)
+        {
+            Console.WriteLine("Command recieved.");
+            var poster = Context.User.ToString();
+            var trade = TradeLists.GetTrade(poster);
+            trade.transactionType = TransactionType.Sell;
+            trade.item = Item;
+            trade.amount = Amount;
+            trade.price = Price;
+            TradeLists.tradeInfo.Add(trade);
+            TradeLists.SaveTradeList();
+            await Context.Channel.SendMessageAsync($"Your trade has been added.");
+        }
+        [Command("List")]
+        async Task ListTrades(string type)
+        {
+            await TradeListReply.TradeListType(Context.User, type);
+        }
+        [Command("sellTradeRemove"), Alias("STR")]
+        async Task RemoveSellingTrade(string item)
+        {
+            foreach(var trade in TradeLists.tradeInfo)
+            {
+                if(trade.trader == Context.User.ToString() && trade.transactionType == TransactionType.Sell && trade.item == item)
+                {
+                    TradeLists.tradeInfo.Remove(trade);
+                    TradeLists.SaveTradeList();
+                }
+            }
+            await Context.Channel.SendMessageAsync("Your trade has been removed.");
+        }
+        
     }
 }

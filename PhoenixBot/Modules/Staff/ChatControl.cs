@@ -7,6 +7,7 @@ using Discord.WebSocket;
 
 namespace PhoenixBot.Modules.Staff
 {
+    [Group("Staff")]
     public class ChatControl : ModuleBase<SocketCommandContext>
     {
         [Command("Mute")]
@@ -29,7 +30,7 @@ namespace PhoenixBot.Modules.Staff
                 User_Accounts.UserAccounts.SaveAccounts();
                 await muteLog.SendMessageAsync($"{target.Mention} has been muted by {Context.User.Mention} for {reason}.");
                 var dmChannel = await user.GetOrCreateDMChannelAsync();
-                await dmChannel.SendMessageAsync($"{target.Mention}, you have been muted for {reason}. Please contact the Guild Leader. If you feel this was abuse of power please contact the Server Own with proof.");
+                await dmChannel.SendMessageAsync($"{target.Mention}, you have been muted for {reason}. Please use `!Appeal mute (your message)` exectly, if you don't get a dm from the bot then you entered in the `!Appeal mute` wrong. If you feel this was abuse of power please contact the Server Own with proof.");
             }
             else
             {
@@ -110,12 +111,17 @@ namespace PhoenixBot.Modules.Staff
         [Command("purge")]
         [Summary("Staff command, used to delete the last series of messages.")]
         [RequireUserPermission(GuildPermission.ManageMessages)]
-        public async Task PurgeChat(ulong delnum, [Remainder] string reason)
+        public async Task PurgeChat(int delnum, [Remainder] string reason)
         {
             var adminLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.adminLogID);
-            //var messages = await Context.Channel.GetMessagesAsync(delnum + 1).Flatten();
             //await Context.Channel.DeleteMessagesAsync(messages);
-            await Context.Channel.DeleteMessageAsync(delnum + 1);
+            var Msgs = await Context.Channel.GetMessagesAsync(delnum + 1).FlattenAsync();
+
+            foreach (IUserMessage Msg in Msgs)
+            {
+                await Msg.DeleteAsync();
+                await Task.Delay(1000);
+            }
             await adminLog.SendMessageAsync($"{Context.User.Mention} deleted {delnum} for {reason}");
         }
         [Command("vmute")]

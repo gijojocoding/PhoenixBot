@@ -9,8 +9,7 @@ namespace PhoenixBot.Features.Trade
 {
     public static class TradeDataStorage
     {
-        //WIP
-        public static void SaveTradeList(List<TradeTransaction> tradeInfo, string filePath)
+        public static void SaveTradeList(IEnumerable<TradeTransaction> tradeInfo, string filePath)
         {
             // Save data
             string json = JsonConvert.SerializeObject(tradeInfo);

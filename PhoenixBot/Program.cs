@@ -10,6 +10,7 @@ namespace PhoenixBot
     {
         DiscordSocketClient _client;
         CommandHandler _handler;
+        
 
         static void Main(string[] args)
             => new Program().StartAsync().GetAwaiter().GetResult();
