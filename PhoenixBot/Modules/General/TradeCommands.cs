@@ -7,11 +7,11 @@ using PhoenixBot.Features.Trade;
 
 namespace PhoenixBot.Modules.General
 {
-    //[Group("Trade")]
+    [Group("Trade")]
     [Cooldown(5)]
     public class TradeCommands : ModuleBase<SocketCommandContext>
     {
-        [Command("Buy")]
+        [Command("null")]
         [Summary("Posts an item your looking to buy in the `Buying` Channel.")]
         public async Task TradeRequest(string itemName, string howMany, [Remainder] string price)
         {
@@ -33,7 +33,7 @@ namespace PhoenixBot.Modules.General
                 await Context.Channel.SendMessageAsync("Error 404: Wrong channel. Please post in the Trade Request Cahnnel.");
             }
         }
-        [Command("Sell")]
+        [Command("null")]
         [Summary("Posts an item your looking to sell in the `Selling` Channel.")]
         public async Task SellRequest(string itemName, string howMany, [Remainder] string price)
         {
@@ -56,7 +56,7 @@ namespace PhoenixBot.Modules.General
 
             }
         }
-        [Command("tBuy"), Alias("tb")]
+        [Command("Buy"), Alias("b")]
         public async Task TestBuy(string Item, string Amount, [Remainder] string Price)
         {
             Console.WriteLine("Command recieved.");
@@ -70,7 +70,7 @@ namespace PhoenixBot.Modules.General
             TradeLists.SaveTradeList();
             await Context.Channel.SendMessageAsync($"Your trade has been added.");
         }
-        [Command("tSell"), Alias("ts")]
+        [Command("Sell"), Alias("s")]
         public async Task TestSell(string Item, string Amount, [Remainder] string Price)
         {
             Console.WriteLine("Command recieved.");
@@ -80,14 +80,15 @@ namespace PhoenixBot.Modules.General
             trade.item = Item;
             trade.amount = Amount;
             trade.price = Price;
-            TradeLists.tradeInfo.Add(trade);
+            //TradeLists.tradeInfo.Add(trade);
             TradeLists.SaveTradeList();
             await Context.Channel.SendMessageAsync($"Your trade has been added.");
         }
         [Command("List")]
         async Task ListTrades(string type)
         {
-            await TradeListReply.TradeListType(Context.User, type);
+            ulong id = Context.Channel.Id;
+            await TradeListReply.TradeListType(Context.User, type, id);
         }
         [Command("sellTradeRemove"), Alias("STR")]
         async Task RemoveSellingTrade(string item)

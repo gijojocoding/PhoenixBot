@@ -4,8 +4,8 @@ using Discord.Commands;
 using Discord;
 using System.Threading.Tasks;
 using System.Reflection;
-using PhoenixBot.Modules;
 using PhoenixBot.User_Accounts;
+using Victoria;
 
 namespace PhoenixBot
 {
@@ -13,7 +13,7 @@ namespace PhoenixBot
     {
         DiscordSocketClient _client;
         CommandService _service;
-        public static IServiceProvider _provider;
+        IServiceProvider _provider;
 
         private ulong GuildId_ = Config.bot.guildID;
         private ulong eventChannelID = ChannelIds.channels.eventID;
@@ -47,11 +47,12 @@ namespace PhoenixBot
             // Mute check
             if (useraccount.IsMuted)
             {
-                if (msg.Content.Contains("!Appeal mute"))
+                if (msg.Content.StartsWith("!Appeal mute") || msg.Content.StartsWith("!Appeal Mute") || msg.Content.StartsWith("!appeal mute") || msg.Content.StartsWith("!appeal Mute"))
                 {
-
-                    var newMsg = msg.Content.TrimStart((char)12);
-                    await Appeal((SocketGuildUser)context.User, newMsg, context.Guild);
+                    await HandleCommandAsync(msg);
+                    await Task.Delay(1);
+                    //var newMsg = msg.Content.TrimStart((char)12);
+                    //await Appeal((SocketGuildUser)context.User, newMsg, context.Guild);
                 }
                 await context.Message.DeleteAsync();
                 return;

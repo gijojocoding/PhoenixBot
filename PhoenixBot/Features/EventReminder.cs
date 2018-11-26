@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using System.Timers;
+using PhoenixBot.Guild_Accounts;
 
 namespace PhoenixBot.Features
 {
     internal static class EventReminder
     {
-        private static ulong GuildId_ = Config.bot.guildID;
-        private static ulong eventChannelID = ChannelIds.channels.eventID;
+
 
         private static Timer eventTimer;
 
@@ -33,83 +33,150 @@ namespace PhoenixBot.Features
 
         private static async Task CheckEventTime()
         {
-            SocketGuild guild = Global.Client.GetGuild(GuildId_);
-            var guildInfo = Guild_Accounts.GuildAccounts.GetAccount(guild);
-
-            if (guildInfo.EventRunning == true)
+        var eventChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.eventID);
+        var guild = GuildAccounts.GetAccount(Global.Client.GetGuild(Config.bot.guildID));
+            if (guild.GuildEvent1Running == true)
             {
-                var difference = guildInfo.CurrentEvent - DateTime.Now;
-                if (difference.TotalHours <= 1 && guildInfo.HourWarning == false)
-                {
-                    await Global.Client.GetGuild(GuildId_).GetTextChannel(eventChannelID).SendMessageAsync($"Event {guildInfo.EventName} starts in 1 hour!");
-                    Console.WriteLine($"{difference}");
-                    guildInfo.HourWarning = true;
-                    Guild_Accounts.GuildAccounts.SaveAccounts();
-                    return;
-                }
-                if (difference.TotalMinutes <= 10 && guildInfo.TenMinuteWarning == false)
-                {
-                    await Global.Client.GetGuild(GuildId_).GetTextChannel(eventChannelID).SendMessageAsync($"Event {guildInfo.EventName} starts in 10 minutes!");
-                    Console.WriteLine($"{difference}");
-                    guildInfo.TenMinuteWarning = true;
-                    Guild_Accounts.GuildAccounts.SaveAccounts();
-                    return;
-                }
-                if (difference.TotalSeconds == 0)
-                {
-                    await Global.Client.GetGuild(GuildId_).GetTextChannel(eventChannelID).SendMessageAsync($"Event {guildInfo.EventName} has started!");
-                    guildInfo.EventRunning = false;
-                    Guild_Accounts.GuildAccounts.SaveAccounts();
-                    guildInfo.HourWarning = false;
-                    Guild_Accounts.GuildAccounts.SaveAccounts();
-                    guildInfo.TenMinuteWarning = false;
-                    Guild_Accounts.GuildAccounts.SaveAccounts();
-                    guildInfo.EventName = null;
-                    Guild_Accounts.GuildAccounts.SaveAccounts();
-                }
-
+                await GuildEventOne();
+            }
+            if (guild.GuildEvent2Running == true)
+            {
+                await GuildEventTwo();
+            }
+            if (guild.TownEvent1Running == true)
+            {
+                await TownEventOne();
+            }
+            if (guild.TownEvent2Running == true)
+            {
+                await TownEventTwo();
+            }
+            if(guild.GroupEventRunning == true)
+            {
+                await GroupEvent();
             }
         }
-        private static async Task RandomFactPost()
+        private static async Task GuildEventOne()
         {
-            var guildInfo = Global.Client.GetGuild(Config.bot.guildID);
-            var guild = Guild_Accounts.GuildAccounts.GetAccount(guildInfo);
-            var LastCheckedDay = guild.DayChecked;
-            var CurrentTimeCheck = DateTime.Now;
-            var difference = CurrentTimeCheck - LastCheckedDay;
-            if (difference.Hours > 24)
+            var guild = GuildAccounts.GetAccount(Global.Client.GetGuild(Config.bot.guildID));
+            var eventChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.eventID);
+            var difference = guild.GuildEvent1Time - DateTime.Now;
+            if (guild.GuildEvent1HourWarning == false && difference.TotalHours <= 1)
             {
-                var number = "No post found.";
-                Random Post = new Random();
-                int postNumber = Post.Next(1, 5);
-                if (postNumber == 1)
-                {
-                    number = Features.FactPost.post.one;
-                }
-                else if (postNumber == 2)
-                {
-                    number = Features.FactPost.post.two;
-                }
-                else if (postNumber == 3)
-                {
-                    number = Features.FactPost.post.three;
-                }
-                else if (postNumber == 4)
-                {
-                    number = Features.FactPost.post.four;
-                }
-                else if (postNumber == 5)
-                {
-                    number = Features.FactPost.post.five;
-                }
-                var embed = new EmbedBuilder();
-                embed.WithTitle("Random Post for the day!")
-                    .WithDescription(number);
-                var channel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.generalID);
-                await channel.SendMessageAsync("", false, embed.Build());
-                guild.DayChecked = DateTime.Now;
-                Guild_Accounts.GuildAccounts.SaveAccounts();
-                return;
+                guild.GuildEvent1HourWarning = true;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Guild Event {guild.GuildEvent1Name} is starting in 1 hour!");
+            }
+            if (guild.GuildEvent1TenMinuteWarning == false && difference.TotalMinutes <= 10)
+            {
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Guild Event {guild.GuildEvent1Name} is starting in 10 minutes!");
+            }
+            if (difference.TotalSeconds <= 2)
+            {
+                guild.GroupEventRunning = false;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Guild Event {guild.GuildEvent1Name} is now starting!");
+            }
+
+        }
+        private static async Task GuildEventTwo()
+        {
+            var guild = GuildAccounts.GetAccount(Global.Client.GetGuild(Config.bot.guildID));
+            var eventChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.eventID);
+            var difference = guild.GuildEvent2Time - DateTime.Now;
+            if (guild.GuildEvent2HourWarning == false && difference.TotalHours <= 1)
+            {
+                guild.GuildEvent2HourWarning = true;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Guild Event {guild.GuildEvent2Name} is starting in 1 hour!");
+            }
+            if (guild.GuildEvent2TenMinuteWarning == false && difference.TotalMinutes <= 10)
+            {
+                guild.GuildEvent2HourWarning = true;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Guild Event {guild.GuildEvent2Name} is starting in 10 minutes!");
+            }
+            if (difference.TotalSeconds <= 2)
+            {
+                guild.GuildEvent2Running = false;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Guild Event {guild.GuildEvent2Name} is now starting!");
+            }
+
+        }
+        private static async Task TownEventOne()
+        {
+            var guild = GuildAccounts.GetAccount(Global.Client.GetGuild(Config.bot.guildID));
+            var eventChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.eventID);
+            var difference = guild.TownEvent1Time - DateTime.Now;
+            if (guild.TownEvent1HourWarning == false && difference.TotalHours <= 1)
+            {
+                guild.TownEvent1HourWarning = true;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Town Event {guild.TownEvent2Name} is starting in 1 hour!");
+            }
+            if (guild.TownEvent1TenMinuteWarning == false && difference.TotalMinutes <= 10)
+            {
+                guild.TownEvent1TenMinuteWarning = true;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Town Event {guild.TownEvent2Name} is starting in 10 minutes!");
+            }
+            if (difference.TotalSeconds <= 2)
+            {
+                guild.TownEvent1Running = false;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Town Event {guild.TownEvent1Name} is now starting!");
+            }
+
+        }
+        private static async Task TownEventTwo()
+        {
+            var guild = GuildAccounts.GetAccount(Global.Client.GetGuild(Config.bot.guildID));
+            var eventChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.eventID);
+            var difference = guild.TownEvent2Time - DateTime.Now;
+            if (guild.TownEvent2HourWarning == false && difference.TotalHours <= 1)
+            {
+                guild.TownEvent2HourWarning = true;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Town Event {guild.TownEvent2Name} is starting in 1 hour!");
+            }
+            if (guild.TownEvent2TenMinuteWarning == false && difference.TotalMinutes <= 10)
+            {
+                guild.TownEvent2TenMinuteWarning = true;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Town Event {guild.TownEvent2Name} is starting in 10 minutes!");
+            }
+            if (difference.TotalSeconds <= 2)
+            {
+                guild.TownEvent2Running = false;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Town Event {guild.TownEvent2Name} is now starting!");
+            }
+
+        }
+        private static async Task GroupEvent()
+        {
+            var guild = GuildAccounts.GetAccount(Global.Client.GetGuild(Config.bot.guildID));
+            var eventChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.eventID);
+            var difference = guild.GroupEventTime - DateTime.Now;
+            if (guild.GroupEventHourWarning == false && difference.TotalHours <= 1)
+            {
+                guild.GroupEventHourWarning = true;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Group Event {guild.GroupEventName} is starting in 1 hour!");
+            }
+            if (guild.GroupEventTenMinuteWarning == false && difference.TotalMinutes <= 10)
+            {
+                guild.GroupEventTenMinuteWarning = true;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Group Event {guild.GroupEventName} is starting in 10 minutes!");
+            }
+            if (difference.TotalSeconds <= 2)
+            {
+                guild.GroupEventRunning = false;
+                GuildAccounts.SaveAccounts();
+                await eventChannel.SendMessageAsync($"Group Event {guild.GroupEventName} is now starting!");
             }
         }
     }

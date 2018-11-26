@@ -59,12 +59,18 @@ namespace PhoenixBot.Guild_Accounts
                 PointsForHealthIncrease = 500,
                 PointsForHealth = 50,
                 PointsForRevive = 20,
-                HourWarning = false,
-                TenMinuteWarning = false,
-                EventRunning = false,
                 DayChecked = DateTime.Now,
                 DebateRunning = false,
-                StickHolder = null
+                StickHolderId = 0,
+                GuildEvent1Running = false,
+                GuildEvent2Running = false,
+                TownEvent1Running = false,
+                TownEvent2Running = false,
+                GroupEventRunning = false,
+                TownRaffleRunning = false,
+                TownRaffleInfo = null,
+                GuildRaffleRunning = false,
+                GuildRaffleInfo = null
             };
             accounts.Add(newAccount);
             SaveAccounts();

@@ -17,19 +17,47 @@ namespace PhoenixBot
         public uint HealthIncrease { get; set; }
         public uint Health { get; set; }
 
-        public string EventName { get; set; }
-
-        public bool EventRunning { get; set; }
-
-        public bool HourWarning { get; set; }
-
-        public bool TenMinuteWarning { get; set; }
-
-        public DateTime CurrentEvent { get; set; }
-
         public DateTime DayChecked { get; set; }
 
         public bool DebateRunning { get; set; }
-        public SocketGuildUser StickHolder { get; set; }
+        public ulong StickHolderId { get; set; }
+        // Town Raffle
+        public bool TownRaffleRunning { get; set; }
+        public string TownRaffleInfo { get; set; }
+        // Guild Raffle
+        public bool GuildRaffleRunning { get; set; }
+        public string GuildRaffleInfo { get; set; }
+        // Guild Events
+        public string GuildEvent1Name { get; set; }
+        public bool GuildEvent1Running { get; set; }
+        public bool GuildEvent1HourWarning { get; set; }
+        public bool GuildEvent1TenMinuteWarning { get; set; }
+        public DateTime GuildEvent1Time { get; set; }
+
+        public string GuildEvent2Name { get; set; }
+        public bool GuildEvent2Running { get; set; }
+        public bool GuildEvent2HourWarning { get; set; }
+        public bool GuildEvent2TenMinuteWarning { get; set; }
+        public DateTime GuildEvent2Time { get; set; }
+
+        // Town Events
+        public string TownEvent1Name { get; set; }
+        public bool TownEvent1Running { get; set; }
+        public bool TownEvent1HourWarning { get; set; }
+        public bool TownEvent1TenMinuteWarning { get; set; }
+        public DateTime TownEvent1Time { get; set; }
+
+        public string TownEvent2Name { get; set; }
+        public bool TownEvent2Running { get; set; }
+        public bool TownEvent2HourWarning { get; set; }
+        public bool TownEvent2TenMinuteWarning { get; set; }
+        public DateTime TownEvent2Time { get; set; }
+
+        // Group Event
+        public string GroupEventName { get; set; }
+        public bool GroupEventRunning { get; set; }
+        public bool GroupEventHourWarning { get; set; }
+        public bool GroupEventTenMinuteWarning { get; set; }
+        public DateTime GroupEventTime { get; set; }
     }
 }

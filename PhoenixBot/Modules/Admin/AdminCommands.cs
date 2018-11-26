@@ -4,11 +4,108 @@ using Discord.Commands;
 using Discord;
 using Discord.WebSocket;
 using PhoenixBot.Guild_Accounts;
+//using PhoenixBot.Features.Event;
 
 namespace PhoenixBot.Modules.Admin
 {
+    [RequireOwner]
     public class AdminCommands : ModuleBase<SocketCommandContext>
     {
+        [Command("ListEvents", RunMode = RunMode.Async)]
+        public async Task ListEventsAdmin()
+        {
+            var eventChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.eventID);
+            var guild = GuildAccounts.GetAccount(Global.Client.GetGuild(Config.bot.guildID));
+            var guild1 = new EmbedBuilder();
+            var guild2 = new EmbedBuilder();
+            var town1 = new EmbedBuilder();
+            var town2 = new EmbedBuilder();
+            var group = new EmbedBuilder();
+            if (guild.TownEvent1Running == true)
+            {
+                town1.WithTitle($"**Town Event: {guild.TownEvent1Name}**")
+                .WithDescription($"Date: {guild.TownEvent1Time.Date} at {guild.TownEvent1Time.TimeOfDay}");
+                await eventChannel.SendMessageAsync("", false, town1.Build());
+            }
+            if (guild.TownEvent2Running == true)
+            {
+                town2.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
+                    .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
+                await eventChannel.SendMessageAsync("", false, town2.Build());
+            }
+            await Task.Delay(1);
+            if (guild.GuildEvent1Running == true)
+            {
+                guild1.WithTitle($"**Town Event: {guild.TownEvent1Name}**")
+                    .WithDescription($"Date: {guild.TownEvent1Time.Date} at {guild.TownEvent1Time.TimeOfDay}");
+                await eventChannel.SendMessageAsync("", false, guild1.Build());
+            }
+            if (guild.GuildEvent2Running == true)
+            {
+                guild2.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
+                    .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
+                await eventChannel.SendMessageAsync("", false, guild2.Build());
+            }
+            await Task.Delay(1);
+            if (guild.GroupEventRunning == true)
+            {
+                group.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
+                    .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
+                await eventChannel.SendMessageAsync("", false, group.Build());
+            }
+        }
+        [Command("ListEvent", RunMode = RunMode.Async)]
+        public async Task ListEventsAdmin(string type)
+        {
+            var eventChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.eventID);
+            var guild = GuildAccounts.GetAccount(Global.Client.GetGuild(Config.bot.guildID));
+            var guild1 = new EmbedBuilder();
+            var guild2 = new EmbedBuilder();
+            var town1 = new EmbedBuilder();
+            var town2 = new EmbedBuilder();
+            var group = new EmbedBuilder();
+            if (type == "town")
+            {
+                if (guild.TownEvent1Running == true)
+                {
+                    town1.WithTitle($"**Town Event: {guild.TownEvent1Name}**")
+                    .WithDescription($"Date: {guild.TownEvent1Time.Date} at {guild.TownEvent1Time.TimeOfDay}");
+                    await eventChannel.SendMessageAsync("", false, town1.Build());
+                }
+                if (guild.TownEvent2Running == true)
+                {
+                    town2.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
+                        .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
+                    await eventChannel.SendMessageAsync("", false, town2.Build());
+                }
+                return;
+            }
+            else if (type == "guild")
+            {
+                if (guild.GuildEvent1Running == true)
+                {
+                    guild1.WithTitle($"**Town Event: {guild.TownEvent1Name}**")
+                        .WithDescription($"Date: {guild.TownEvent1Time.Date} at {guild.TownEvent1Time.TimeOfDay}");
+                    await eventChannel.SendMessageAsync("", false, guild1.Build());
+                }
+                if (guild.GuildEvent2Running == true)
+                {
+                    guild2.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
+                        .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
+                    await eventChannel.SendMessageAsync("", false, guild2.Build());
+                }
+            }
+            else if (type == "group")
+            {
+                if (guild.GroupEventRunning == true)
+                {
+                    group.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
+                        .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
+                    await eventChannel.SendMessageAsync("", false, group.Build());
+                }
+            }
+        }
+
         [Command("user")]
         [RequireOwner]
         public async Task UsernameCmd()
@@ -118,5 +215,5 @@ namespace PhoenixBot.Modules.Admin
         {
             await ReplyAsync($"Pong {Context.User}!");
         }
-    }
+    } 
 }

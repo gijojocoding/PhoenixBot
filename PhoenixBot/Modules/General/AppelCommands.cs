@@ -11,6 +11,26 @@ namespace PhoenixBot.Modules.General
     [Group("Appeal")]
     public class AppelCommands : ModuleBase<SocketCommandContext>
     {
+        [Command("Mute")]
+        [Summary("Puts in an appeal about a mute you are currently under. Abuse of this command, muted or otherwise, will result in a kick or permanent mute.")]
+        public async Task MuteAppeal([Remainder] string msg)
+        {
+            var user = User_Accounts.UserAccounts.GetAccount(Context.User);
+            var logChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.requestID);
+            //var msg = Context.Message.Content.Remove(0, 13);
+            if (user.IsMuted == false)
+            {
+                
+                await logChannel.SendMessageAsync($"{Context.User.Username} has sent an appeal without being muted.");
+                return;
+            }
+            var embed = new EmbedBuilder();
+            embed.WithTitle("Mute Appeal")
+                .WithDescription(msg)
+                .WithColor(0, 0, 150);
+            await logChannel.SendMessageAsync("", false, embed.Build());
+
+        }
         [Command("Warning")]
         [Summary("Puts in an appeal about a warning you got. Please give enough info to argue your case, like when you recieved the warning and the reason you were given. Abuse of this command will result in a mute.")]
         public async Task WarningAppeal([Remainder] string message)

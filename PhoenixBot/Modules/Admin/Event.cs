@@ -9,41 +9,78 @@ using PhoenixBot.Guild_Accounts;
 namespace PhoenixBot.Modules.Admin
 {
     [Group("Event")]
+    [RequireUserPermission(GuildPermission.Administrator)]
     public class Event : ModuleBase<SocketCommandContext>
     {
-        [Command("Set")]
-        [Summary("Admin command, sets event info. Only one event can be set at a time.")]
-        [RequireOwner]
-        public async Task SetEvent(int sMonth, int sDay, int sYear, int sHour, int sMinute, int sSecond, [Remainder] string name)
+        [Command("AddTownEvent")]
+        [Summary("Admin command, Adds a Town Event.")]
+        public async Task SetTownEvent(DateTime date, int hour, int minute, [Remainder] string name)
         {
-            if (Guild_Accounts.GuildAccounts.GetAccount(Context.Guild).EventRunning == true) return;
-            var seteventday = new DateTime(sYear, sMonth, sDay, sHour, sMinute, sSecond);
-            var cmdEventName = name;
-            GuildAccounts.GetAccount(Context.Guild).CurrentEvent = seteventday;
-            GuildAccounts.SaveAccounts();
-            GuildAccounts.GetAccount(Context.Guild).EventName = cmdEventName;
-            GuildAccounts.SaveAccounts();
-            GuildAccounts.GetAccount(Context.Guild).EventRunning = true;
-            GuildAccounts.SaveAccounts();
-            await Context.Channel.SendMessageAsync($"Event {GuildAccounts.GetAccount(Context.Guild).EventName} is set for {GuildAccounts.GetAccount(Context.Guild).CurrentEvent}");
+            var guild = GuildAccounts.GetAccount(Context.Guild);
+            if (guild.TownEvent1Running == false)
+            {
+                guild.TownEvent1Name = name;
+                guild.TownEvent1Running = true;
+                guild.TownEvent1HourWarning = false;
+                guild.TownEvent1TenMinuteWarning = false;
+                guild.TownEvent1Time = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
+            }
+            else if (guild.TownEvent2Running == false)
+            {
+                guild.TownEvent2Name = name;
+                guild.TownEvent2Running = true;
+                guild.TownEvent2HourWarning = false;
+                guild.TownEvent2TenMinuteWarning = false;
+                guild.TownEvent2Time= new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
+            }
+            else
+            {
+                await ReplyAsync("Error 404: Two Town Events are already set.");
+            }
         }
-        [Command("Remove")]
-        [Summary("Admin command, removes the current running event.")]
-        [RequireOwner]
-        public async Task RemoveEvent()
+        [Command("AddGuildEvent")]
+        [Summary("Admin command, Adds a Guild Event.")]
+        public async Task SetGuildEvent(DateTime date, int hour, int minute, [Remainder] string name)
         {
-            SocketGuild guild = Global.Client.GetGuild(Config.bot.guildID);
-            var guildInfo = Guild_Accounts.GuildAccounts.GetAccount(guild);
-            guildInfo.EventRunning = false;
-            Guild_Accounts.GuildAccounts.SaveAccounts();
-            guildInfo.HourWarning = false;
-            Guild_Accounts.GuildAccounts.SaveAccounts();
-            guildInfo.TenMinuteWarning = false;
-            Guild_Accounts.GuildAccounts.SaveAccounts();
-            guildInfo.EventName = null;
-            Guild_Accounts.GuildAccounts.SaveAccounts();
-            await Context.Channel.SendMessageAsync($"Event has been removed!");
-            Console.WriteLine($"Event info! Event Is running {GuildAccounts.GetAccount(Context.Guild).EventRunning}, and Event name is {GuildAccounts.GetAccount(Context.Guild).EventName}");
+            var guild = GuildAccounts.GetAccount(Context.Guild);
+            if (guild.GuildEvent1Running == false)
+            {
+                guild.GuildEvent1Name = name;
+                guild.GuildEvent1Running = true;
+                guild.GuildEvent1HourWarning = false;
+                guild.GuildEvent1TenMinuteWarning = false;
+                guild.GuildEvent1Time= new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
+            }
+            else if (guild.GuildEvent2Running == false)
+            {
+                guild.GuildEvent2Name = name;
+                guild.GuildEvent2Running = true;
+                guild.GuildEvent2HourWarning = false;
+                guild.GuildEvent2TenMinuteWarning = false;
+                guild.GuildEvent2Time = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
+            }
+            else
+            {
+                await ReplyAsync("Error 404: Two Guild Events are already set.");
+            }
+        }
+        [Command("SetGroupEvent")]
+        [Summary("Admin Command, Adds a Group Event.")]
+        public async Task AddGroupEvent(DateTime date, int hour, int minute, [Remainder] string name)
+        {
+            var guild = GuildAccounts.GetAccount(Context.Guild);
+            if (guild.GroupEventRunning == false)
+            {
+                guild.GuildEvent2Name = name;
+                guild.GuildEvent2Running = true;
+                guild.GuildEvent2HourWarning = false;
+                guild.GuildEvent2TenMinuteWarning = false;
+                guild.GuildEvent2Time = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
+            }
+            else
+            {
+                await ReplyAsync("Error 404: A Group Event is already set.");
+            }
         }
     }
 }

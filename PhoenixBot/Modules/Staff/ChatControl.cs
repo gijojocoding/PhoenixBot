@@ -12,7 +12,7 @@ namespace PhoenixBot.Modules.Staff
     {
         [Command("Mute")]
         [Summary("Staff Command, used stop a person from sending messages. **DO NOT ABUSE THE COMMAND!**")]
-        public async Task Mute(IGuildUser user, [Remainder]string reason)
+        public async Task Mute(IGuildUser user, [Remainder]string reason = "")
         {
             var muteLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.muteLogID);
             SocketUser target = null;

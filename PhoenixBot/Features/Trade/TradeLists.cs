@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using Newtonsoft.Json;
-using Discord.WebSocket;
 using System.Linq;
 
 namespace PhoenixBot.Features.Trade
 {
     public static class TradeLists
     {
-        //WIP
         public static List<TradeTransaction> tradeInfo;
         private static string tradeListFile = "Resources/ListOfTrades.json";
 
@@ -66,7 +61,7 @@ namespace PhoenixBot.Features.Trade
             {
                 
                 trader = user,
-                transactionType = TransactionType.none,
+                transactionType = TransactionType.None,
                 item = "Null",
                 amount = "Null",
                 price = "Null"

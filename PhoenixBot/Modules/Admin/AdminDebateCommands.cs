@@ -45,10 +45,10 @@ namespace PhoenixBot.Modules.Admin
 
             var guild = GuildAccounts.GetAccount(Context.Guild);
             Console.WriteLine(guild);
-            guild.StickHolder = null;
+            guild.StickHolderId = 0;
             guild.DebateRunning = true;
             GuildAccounts.SaveAccounts();
-            await Context.Channel.SendMessageAsync("Guild stick holder id: " + guild.StickHolder);
+            await Context.Channel.SendMessageAsync("Guild stick holder id: " + guild.StickHolderId);
             await Context.Channel.SendMessageAsync("Debate running: " + guild.DebateRunning);
             GuildAccounts.SaveAccounts();
             await Context.Channel.SendMessageAsync("Both debate channels should be open.");
@@ -62,14 +62,15 @@ namespace PhoenixBot.Modules.Admin
             var guild = GuildAccounts.GetAccount(Context.Guild);
             var voiceChannel = Context.Guild.GetVoiceChannel(ChannelIds.channels.debateVCID);
             var textChannel = Context.Guild.GetTextChannel(ChannelIds.channels.debateTCID);
-            if(guild.StickHolder != null)
+            if(guild.StickHolderId != 0)
             {
-                var currentHolder = guild.StickHolder;
-                await voiceChannel.RemovePermissionOverwriteAsync(currentHolder);
-                guild.StickHolder = null;
+                var currentHolderId = guild.StickHolderId;
+                SocketGuildUser holder = Global.Client.GetGuild(Config.bot.guildID).GetUser(currentHolderId);
+                await voiceChannel.RemovePermissionOverwriteAsync(holder);
+                guild.StickHolderId = 0;
                 GuildAccounts.SaveAccounts();
             }
-            var currentHolderID =  guild.StickHolder;
+            //var currentHolderID =  guild.StickHolderId;
             var deny = new OverwritePermissions(speak: PermValue.Deny, connect: PermValue.Deny, readMessageHistory: PermValue.Deny);
             var tDeny = new OverwritePermissions(connect: PermValue.Deny, readMessageHistory: PermValue.Deny, sendMessages: PermValue.Deny);
             await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.guildMemberID), deny);
@@ -82,7 +83,7 @@ namespace PhoenixBot.Modules.Admin
         }
         [Command("GiveStick")]
         [Alias("GS")]
-        [Summary("Admin command to force the ")]
+        [Summary("Admin command to force the speaking stick to someone else")]
         public async Task GiveStick(SocketGuildUser user)
         {
             if (!RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) || !RoleCheck.HasChiefRole((SocketGuildUser)Context.User) || Context.User.Id != Context.Guild.Owner.Id) return;
@@ -92,11 +93,13 @@ namespace PhoenixBot.Modules.Admin
                 await ReplyAsync("The debate is not running.");
                 return;
             }
+            var currentHolderId = guild.StickHolderId;
+            SocketGuildUser holder = Global.Client.GetGuild(Config.bot.guildID).GetUser(currentHolderId);
             var voiceChannel = Context.Guild.GetVoiceChannel(ChannelIds.channels.debateVCID);
-            await voiceChannel.RemovePermissionOverwriteAsync(guild.StickHolder);
+            await voiceChannel.RemovePermissionOverwriteAsync(holder);
             var allow = new OverwritePermissions(speak: PermValue.Allow, connect: PermValue.Allow, viewChannel: PermValue.Allow);
             await voiceChannel.AddPermissionOverwriteAsync(user, allow);
-            guild.StickHolder = user;
+            guild.StickHolderId = user.Id;
             GuildAccounts.SaveAccounts();
         }
         [Command("RemoveStick")]
@@ -113,9 +116,9 @@ namespace PhoenixBot.Modules.Admin
             }
             var deny = new OverwritePermissions(speak: PermValue.Deny, connect: PermValue.Allow);
             var voiceChannel = Context.Guild.GetVoiceChannel(ChannelIds.channels.debateVCID);
-            await voiceChannel.AddPermissionOverwriteAsync(user, deny);
+            await voiceChannel.RemovePermissionOverwriteAsync(user);
             var debateTC = Global.Client.GetGuild(Context.Guild.Id).GetTextChannel(ChannelIds.channels.debateTCID);
-            guild.StickHolder = null;
+            guild.StickHolderId = 0;
             GuildAccounts.SaveAccounts();
             await debateTC.SendMessageAsync("The speaking stick is open for grabs!");
         }
@@ -126,9 +129,12 @@ namespace PhoenixBot.Modules.Admin
         {
             if (!RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) || !RoleCheck.HasChiefRole((SocketGuildUser)Context.User) || Context.User.Id != Context.Guild.Owner.Id) return;
             var guild = GuildAccounts.GetAccount(Context.Guild);
+            var currentHolderId = guild.StickHolderId;
+            SocketGuildUser holder = Global.Client.GetGuild(Config.bot.guildID).GetUser(currentHolderId);
             var embed = new EmbedBuilder();
             embed.WithTitle("Current Debate Info")
-                .AddField("ID set for who is holding the stick:", guild.StickHolder)
+                .AddField("Person holding the stick:", holder.Username + "or" + holder.Nickname)
+                .AddField("ID set for who is holding the stick:", guild.StickHolderId)
                 .AddField("Debate is running:", guild.DebateRunning);
             await ReplyAsync("", false, embed.Build());
         }

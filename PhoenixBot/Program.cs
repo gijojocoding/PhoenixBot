@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using Discord;
 using PhoenixBot.Features;
+using Victoria;
 
 namespace PhoenixBot
 {
@@ -10,6 +11,10 @@ namespace PhoenixBot
     {
         DiscordSocketClient _client;
         CommandHandler _handler;
+        AudioService _audioService;
+        Lavalink _lavalink;
+        
+        
         
 
         static void Main(string[] args)
@@ -27,7 +32,7 @@ namespace PhoenixBot
             _handler = new CommandHandler();
             await _client.LoginAsync(TokenType.Bot, Config.bot.token);
             await _client.StartAsync();
-            await _client.SetGameAsync("!help");
+            await _client.SetGameAsync(Config.bot.cmdPrefix + "help");
             Global.Client = _client;
             _client.Ready += EventReminder.EventTimeCheck;
             _handler = new CommandHandler();
@@ -35,10 +40,16 @@ namespace PhoenixBot
             await Task.Delay(-1);
 
         }
-        private async Task Log(LogMessage msg)
+        public async Task Log(LogMessage msg)
         {
             Console.WriteLine(msg.Message);
 
+        }
+        private async Task OnReady()
+        {
+            await EventReminder.EventTimeCheck();
+            var node = await _lavalink.AddNodeAsync(_client).ConfigureAwait(false);
+            _audioService.Initialize(node);
         }
     }
 }

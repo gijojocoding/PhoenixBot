@@ -37,5 +37,7 @@ namespace PhoenixBot
         public string cmdPrefix;
         //Guild ID
         public ulong guildID;
+        // bot ID
+        public ulong botID;
     }
 }

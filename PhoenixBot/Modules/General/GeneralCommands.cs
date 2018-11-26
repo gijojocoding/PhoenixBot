@@ -72,40 +72,6 @@ namespace PhoenixBot.Modules.General
                 .AddField("Command Prefix:", $"{Config.bot.cmdPrefix}");
             await ReplyAsync("", false, embed.Build());
         }
-        [Command("event")]
-        [Summary("Posts info about the current running event.")]
-        public async Task EventStartsIn()
-        {
-            if (Context.IsPrivate == true) return;
-            var guild = Context.Guild;
-            var currentGuild = GuildAccounts.GetAccount(guild);
-            if (currentGuild.EventRunning == false)
-            {
-                await Context.Channel.SendMessageAsync("No event is currently running!");
-                return;
-            }
-            var difference = GuildAccounts.GetAccount(Context.Guild).CurrentEvent - DateTime.Now;
-            var EventDays = difference.Days;
-            var EventHours = difference.Hours;
-            var EventMinutes = difference.Minutes;
-            var EventSeconds = difference.Seconds;
-            if (difference.TotalSeconds <= 0)
-            {
-                await Context.Channel.SendMessageAsync("Event has Passed");
-                SocketGuild guildID = Global.Client.GetGuild(Config.bot.guildID);
-                var guildInfo = Guild_Accounts.GuildAccounts.GetAccount(guildID);
-                guildInfo.EventRunning = false;
-                Guild_Accounts.GuildAccounts.SaveAccounts();
-                guildInfo.HourWarning = false;
-                Guild_Accounts.GuildAccounts.SaveAccounts();
-                guildInfo.TenMinuteWarning = false;
-                Guild_Accounts.GuildAccounts.SaveAccounts();
-                guildInfo.EventName = null;
-                Guild_Accounts.GuildAccounts.SaveAccounts();
-                return;
-            }
-            await Context.Channel.SendMessageAsync($"Event {GuildAccounts.GetAccount(Context.Guild).EventName} starts in {EventDays} day(s),{EventHours} hour(s), {EventMinutes} minute(s) and {EventSeconds} seconds(s)! ");
-        }
         [Command("Tokens")]
         [Summary("Gives info about the tokens in the game.")]
         public async Task Tokens()

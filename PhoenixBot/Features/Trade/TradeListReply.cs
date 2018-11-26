@@ -12,9 +12,9 @@ namespace PhoenixBot.Features.Trade
 {
     public class TradeListReply : ModuleBase<SocketCommandContext>
     {
-        public static async Task TradeListType(SocketUser user, string type)
+        public static async Task TradeListType(SocketUser user, string type, ulong channelId)
         {
-
+            var channel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(channelId);
             if (type == "buy" || type == "buying")
             {
                 foreach (var trade in TradeLists.tradeInfo)
@@ -28,7 +28,7 @@ namespace PhoenixBot.Features.Trade
                             .AddField("Buying:", trade.item)
                             .AddField("Amount:", trade.amount)
                             .AddField("Price:", trade.price);
-                        await dmChannel.SendMessageAsync("", false, embed.Build());
+                        await channel.SendMessageAsync("", false, embed.Build());
                         await Task.Delay(500);
                     }
                 }
@@ -46,7 +46,7 @@ namespace PhoenixBot.Features.Trade
                             .AddField("Buying:", trade.item)
                             .AddField("Amount:", trade.amount)
                             .AddField("Price:", trade.price);
-                        await dmChannel.SendMessageAsync("", false, embed.Build());
+                        await channel.SendMessageAsync("", false, embed.Build());
                         await Task.Delay(500);
                     }
                 }

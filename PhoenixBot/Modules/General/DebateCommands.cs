@@ -15,20 +15,22 @@ namespace PhoenixBot.Modules.General
         public async Task GiveStickTo(SocketGuildUser user)
         {
             if (Context.IsPrivate == true) return;
+            var guild = GuildAccounts.GetAccount(Context.Guild);
+            var currentHolderId = guild.StickHolderId;
+            SocketGuildUser holder = Global.Client.GetGuild(Config.bot.guildID).GetUser(currentHolderId);
             if (Context.Channel.Id != ChannelIds.channels.debateTCID)
             {
                 await ReplyAsync("Please use the command in the Debate text channel thank you.");
                 return;
             }
-            var guild = GuildAccounts.GetAccount(Context.Guild);
             if (guild.DebateRunning == false) return;
             var self = Context.User;
-            if (guild.StickHolder != Context.User) return;
+            if (holder != Context.User) return;
             var allow = new OverwritePermissions(speak: PermValue.Allow, connect: PermValue.Allow);
             var voiceChannel = Context.Guild.GetVoiceChannel(ChannelIds.channels.debateVCID);
             await voiceChannel.AddPermissionOverwriteAsync(user, allow);
             await voiceChannel.RemovePermissionOverwriteAsync(self);
-            guild.StickHolder = user;
+            guild.StickHolderId = user.Id;
             GuildAccounts.SaveAccounts();
             await Context.Channel.SendMessageAsync($"{self} passed the Speaking Stick to {user}");
         }
@@ -45,11 +47,13 @@ namespace PhoenixBot.Modules.General
             var guild = GuildAccounts.GetAccount(Context.Guild);
             if (guild.DebateRunning == false) return;
             var self = Context.User;
-            if (guild.StickHolder != Context.User) return;
+            var currentHolderId = guild.StickHolderId;
+            SocketGuildUser holder = Global.Client.GetGuild(Config.bot.guildID).GetUser(currentHolderId);
+            if (holder != Context.User) return;
             var deny = new OverwritePermissions(speak: PermValue.Deny, connect: PermValue.Allow);
             var voiceChannel = Context.Guild.GetVoiceChannel(ChannelIds.channels.debateVCID);
             await voiceChannel.RemovePermissionOverwriteAsync(self);
-            guild.StickHolder = null;
+            guild.StickHolderId = 0;
             GuildAccounts.SaveAccounts();
             await Context.Channel.SendMessageAsync($"{self} gave up the stick! Quick grab it!");
         }
@@ -64,13 +68,15 @@ namespace PhoenixBot.Modules.General
                 return;
             }
             var guild = GuildAccounts.GetAccount(Context.Guild);
-            if (guild.DebateRunning == true && guild.StickHolder == null)
+            var currentHolderId = guild.StickHolderId;
+            SocketGuildUser holder = Global.Client.GetGuild(Config.bot.guildID).GetUser(currentHolderId);
+            if (guild.DebateRunning == true && guild.StickHolderId == 0)
             {
                 var self = Context.User as SocketGuildUser;
                 var allow = new OverwritePermissions(speak: PermValue.Allow, connect: PermValue.Allow);
                 var voiceChannel = Context.Guild.GetVoiceChannel(ChannelIds.channels.debateVCID);
                 await voiceChannel.AddPermissionOverwriteAsync(self, allow);
-                guild.StickHolder = self;
+                guild.StickHolderId = self.Id;
                 GuildAccounts.SaveAccounts();
                 await Context.Channel.SendMessageAsync($"{self} got the stick!");
             }
