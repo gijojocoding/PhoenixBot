@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using PhoenixBot.User_Accounts;
 using Victoria;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PhoenixBot
 {
@@ -13,18 +14,24 @@ namespace PhoenixBot
     {
         DiscordSocketClient _client;
         CommandService _service;
-        IServiceProvider _provider;
+        public IServiceProvider _provider;
+        AudioService _audioService;
+        Lavalink _lavalink;
 
         private ulong GuildId_ = Config.bot.guildID;
         private ulong eventChannelID = ChannelIds.channels.eventID;
 
-        public async Task InitializeAsynce(DiscordSocketClient client)
+        public async Task InitializeAsynce(DiscordSocketClient client, IServiceProvider serviceProvider)
         {
             _client = client;
             _service = new CommandService();
+            _provider = serviceProvider;
+            _lavalink = new Lavalink();
+            _audioService = new AudioService(_lavalink);
             await _service.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             _client.MessageReceived += PreCommandHandle;
             _client.UserJoined += UserJoined;
+            _client.Ready += OnReady;
         }
         public async Task UserJoined(SocketGuildUser user)
         {
@@ -37,7 +44,11 @@ namespace PhoenixBot
                 $"If you represent a guild please enter `!Diplomat` in the joining channel. Thank you", false, dataEmbed.Build());
 
         }
-
+        private async Task OnReady()
+        {
+            var node = await _lavalink.AddNodeAsync(_client).ConfigureAwait(false);
+            _audioService.Initialize(node);
+        }
         private async Task PreCommandHandle(SocketMessage s)
         {
             var msg = s as SocketUserMessage;

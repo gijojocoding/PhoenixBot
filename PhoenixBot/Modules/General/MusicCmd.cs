@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 
 namespace PhoenixBot.Modules.General
 {
-    [Group("Music")]
+
     public class MusicCmd : ModuleBase<SocketCommandContext>
     {
-        AudioService _audioService;
+        AudioService audioService;
 
         [Command("Play", RunMode = RunMode.Async)]
         public async Task PlayMusic([Remainder] string query)
         {
             var bot = Context.Guild.GetUser(Config.bot.botID);
             var voiceChannel = bot.VoiceChannel;
-            await _audioService.ConnectAndPlayAsync(voiceChannel, query);
+            await audioService.ConnectAndPlayAsync(voiceChannel, query);
         }
     }
 }

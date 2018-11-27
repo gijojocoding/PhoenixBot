@@ -11,7 +11,7 @@ namespace PhoenixBot.Modules.Admin
     [RequireUserPermission(GuildPermission.Administrator)]
     public class VoiceControl : ModuleBase<SocketCommandContext>
     {
-        [Command("VJoin", RunMode = RunMode.Async)]
+        [Command("summon", RunMode = RunMode.Async)]
         async Task AdminJoinVoice()
         {
             var user = Context.User as IGuildUser;
@@ -20,7 +20,7 @@ namespace PhoenixBot.Modules.Admin
             await voiceChannel.ConnectAsync();
             Console.WriteLine($"The bot has Join {voiceChannel.Name}");
         }
-        [Command("VLeave")]
+        [Command("dispel")]
         async Task AdminLeaveVoice()
         {
             var user = Context.Guild.GetUser(Config.bot.botID);
