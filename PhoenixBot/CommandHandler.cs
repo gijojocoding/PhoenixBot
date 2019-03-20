@@ -54,6 +54,7 @@ namespace PhoenixBot
             var msg = s as SocketUserMessage;
             if (msg == null) return;
             var context = new SocketCommandContext(_client, msg);
+
             var useraccount = UserAccounts.GetAccount(context.User);
             // Mute check
             if (useraccount.IsMuted)
@@ -76,6 +77,7 @@ namespace PhoenixBot
         {
             var context = new SocketCommandContext(_client, msg);
             int argPos = 0;
+            await _service.ExecuteAsync(context, argPos, _provider);
             if (msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos)
                 || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {

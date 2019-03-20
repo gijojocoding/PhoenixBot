@@ -15,11 +15,9 @@ namespace PhoenixBot.Modules.Music
 {
     public class AudioService
     {
-        public static Lavalink _lavalink;
-        public static AudioService audioService;
-
+        private Lavalink _lavalink;
         public AudioService(Lavalink lavalink)
-            => _lavalink = lavalink;
+           => _lavalink = lavalink;
 
         private readonly Lazy<ConcurrentDictionary<ulong, AudioOptions>> _lazyOptions
     = new Lazy<ConcurrentDictionary<ulong, AudioOptions>>();

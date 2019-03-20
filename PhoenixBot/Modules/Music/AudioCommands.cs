@@ -7,14 +7,14 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Victoria;
 
+
 namespace PhoenixBot.Modules.Music
 {
     [RequireOwner]
     public class AudioCommands : ModuleBase<SocketCommandContext>
     {
-        //AudioService AudioService = Program._audioService;
 
-        public static AudioService AudioService { get; }
+        AudioService AudioService {  get;  set; }
 
         [Command("Play", RunMode = RunMode.Default)]
         public async Task Play([Remainder]string search)
