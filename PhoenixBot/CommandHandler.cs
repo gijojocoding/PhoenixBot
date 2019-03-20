@@ -12,11 +12,11 @@ namespace PhoenixBot
 {
     class CommandHandler
     {
-        DiscordSocketClient _client;
-        CommandService _service;
-        IServiceProvider _provider;
-        AudioService _audioService;
-        Lavalink _lavalink;
+        DiscordSocketClient _client { get;  set; }
+        CommandService _service { get; set; }
+        IServiceProvider _provider { get; set; }
+        AudioService _audioService { get; set; }
+        Lavalink _lavalink { get; set; }
 
         private ulong GuildId_ = Config.bot.guildID;
         private ulong eventChannelID = ChannelIds.channels.eventID;

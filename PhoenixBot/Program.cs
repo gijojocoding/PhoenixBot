@@ -39,7 +39,7 @@ namespace PhoenixBot
                 .AddSingleton(_handler)
                 .AddSingleton(_audioService)
                 .AddSingleton(_lavalink)
-
+                .AddSingleton(node)
                 .BuildServiceProvider();
             
 

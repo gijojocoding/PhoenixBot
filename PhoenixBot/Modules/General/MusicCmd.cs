@@ -5,20 +5,21 @@ using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
 using System.Threading.Tasks;
+using PhoenixBot.Modules.Music;
 
 namespace PhoenixBot.Modules.General
 {
     [RequireOwner]
     public class MusicCmd : ModuleBase<SocketCommandContext>
     {
-        AudioService audioService;
+        AudioService AudioService { get; set; }
 
-        [Command("Play", RunMode = RunMode.Async)]
+        [Command("blank", RunMode = RunMode.Async)]
         public async Task PlayMusic([Remainder] string query)
         {
             var bot = Context.Guild.GetUser(Config.bot.botID);
             var voiceChannel = bot.VoiceChannel;
-            await audioService.ConnectAndPlayAsync(voiceChannel, query);
+            await AudioService.ConnectAndPlayAsync(voiceChannel, query);
         }
     }
 }
