@@ -12,7 +12,6 @@ namespace PhoenixBot.Modules.General
     [RequireOwner]
     public class MusicCmd : ModuleBase<SocketCommandContext>
     {
-        AudioService AudioService { get; set; }
 
         [Command("blank", RunMode = RunMode.Async)]
         public async Task PlayMusic([Remainder] string query)
@@ -21,5 +20,6 @@ namespace PhoenixBot.Modules.General
             var voiceChannel = bot.VoiceChannel;
             await AudioService.ConnectAndPlayAsync(voiceChannel, query);
         }
+
     }
 }
