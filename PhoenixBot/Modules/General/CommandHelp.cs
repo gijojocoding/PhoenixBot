@@ -49,7 +49,6 @@ namespace PhoenixBot.Modules.General
             {
                 builder.Fields.RemoveRange(0, 25);
                 await dmChannel.SendMessageAsync("", false, builder.Build());
-
             }
         }
         [Cooldown(15)]

@@ -105,67 +105,13 @@ namespace PhoenixBot.Modules.Admin
                 }
             }
         }
-
         [Command("user")]
         [RequireOwner]
         public async Task UsernameCmd()
         {
             await ReplyAsync($"Context user: {Context.User} Context user ToString: {Context.User.ToString()} Context user username: {Context.User.Username}");
         }
-        [Command("AddXp")]
-        [Summary("Admin command, adds xp to a user's account.")]
-        [RequireOwner]
-        public async Task AddXp(SocketGuildUser user, uint xp)
-        {
-            if (!RoleCheck.HasChiefRole((SocketGuildUser)Context.User)) return;
-            var userAccount = User_Accounts.UserAccounts.GetAccount(user);
-            uint oldLevel = userAccount.LevelNumber;
-            userAccount.XP += xp;
-            User_Accounts.UserAccounts.SaveAccounts();
-            if (oldLevel != userAccount.LevelNumber)
-            {
-                var pointsAdded = (userAccount.LevelNumber * 20);
-                userAccount.Points += pointsAdded;
-                User_Accounts.UserAccounts.SaveAccounts();
-                //User Leveled Up
-                var embed = new EmbedBuilder();
-                embed.WithTitle("Level Up")
-                    .WithDescription($"{user.Mention} **JUST LEVELED UP! THEY ARE NOW {userAccount.LevelNumber}!** They got {pointsAdded} feathers!");
-                await Context.Channel.SendMessageAsync("", false, embed.Build());
-            }
-        }
-        [Command("RemoveXp")]
-        [Summary("Admin command, removes xp from a user's account.")]
-        [RequireOwner]
-        public async Task RemoveXp(SocketGuildUser user, uint xp)
-        {
-            if (!RoleCheck.HasChiefRole((SocketGuildUser)Context.User)) return;
-            var userAccount = User_Accounts.UserAccounts.GetAccount(user);
-            if (xp > userAccount.XP)
-            {
-                userAccount.XP = 0;
-                User_Accounts.UserAccounts.SaveAccounts();
-                await ReplyAsync($"{user.Mention} now has {userAccount.XP}");
-                return;
-            }
-            userAccount.XP -= xp;
-            User_Accounts.UserAccounts.SaveAccounts();
-            await ReplyAsync($"{user.Mention} now has {userAccount.XP}");
-        }
-        [Command("adminpurge")]
-        [Summary("Admin command, deletes a set of messages. no log created.")]
-        [RequireUserPermission(GuildPermission.Administrator)]
-        public async Task AdminPurgeChat(int delnum)
-        {
-            //var messages = await Context.Channel.GetMessagesAsync(delnum + 1).Flatten();
-            var Msgs = await Context.Channel.GetMessagesAsync(delnum + 1).FlattenAsync();
 
-            foreach (IUserMessage Msg in Msgs)
-            {
-                await Msg.DeleteAsync();
-                await Task.Delay(1000);
-            }
-        }
         [Command("ChangeLog")]
         [Summary("Posts the Change Log of the most recent changes.")]
         [RequireOwner]
@@ -214,6 +160,16 @@ namespace PhoenixBot.Modules.Admin
         public async Task Pong()
         {
             await ReplyAsync($"Pong {Context.User}!");
+        }
+        [Command("SyncAccounts", RunMode = RunMode.Async)]
+        async Task ConvertHuntCmd()
+        {
+            foreach(var account in User_Accounts.UserAccounts.accounts)
+            {
+                Features.Games.UserAccounts.GameUserAccounts.GetAccount(account.ID);
+                Features.Games.UserAccounts.GameUserAccounts.SaveAccounts();
+            }
+            await ReplyAsync("Accounts have been Synced!");
         }
     } 
 }

@@ -12,7 +12,7 @@ namespace PhoenixBot.Modules.General
     public class AppelCommands : ModuleBase<SocketCommandContext>
     {
         [Command("Mute")]
-        [Summary("Puts in an appeal about a mute you are currently under. Abuse of this command, muted or otherwise, will result in a kick or permanent mute.")]
+        [Summary("Puts in an appeal about a mute you are currently under.")]
         public async Task MuteAppeal([Remainder] string msg)
         {
             var user = User_Accounts.UserAccounts.GetAccount(Context.User);
@@ -32,7 +32,7 @@ namespace PhoenixBot.Modules.General
 
         }
         [Command("Warning")]
-        [Summary("Puts in an appeal about a warning you got. Please give enough info to argue your case, like when you recieved the warning and the reason you were given. Abuse of this command will result in a mute.")]
+        [Summary("Puts in an appeal about a warning you got. Please give enough info to argue your case.")]
         public async Task WarningAppeal([Remainder] string message)
         {
             if (Context.IsPrivate == true) return;
@@ -45,7 +45,7 @@ namespace PhoenixBot.Modules.General
             await logChannel.SendMessageAsync("", false, embed.Build());
         }
         [Command("DeniedRequest")]
-        [Summary("Puts in an appeal about a denied request. Please explain what you had requested, the start/end times (based upon request), topic (if a meeting/debate request), and the reason given. Abuse of this command will result in a warning and/or mute.")]
+        [Summary("Puts in an appeal about a denied request. Repeated use after being denied a 2nd time will resault in a warning or mute.")]
         public async Task RequestAppeal([Remainder] string message)
         {
             if (Context.IsPrivate == true) return;

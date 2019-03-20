@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PhoenixBot.Modules.General
 {
-
+    [RequireOwner]
     public class MusicCmd : ModuleBase<SocketCommandContext>
     {
         AudioService audioService;

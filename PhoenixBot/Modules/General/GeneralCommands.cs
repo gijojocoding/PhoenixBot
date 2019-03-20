@@ -40,10 +40,7 @@ namespace PhoenixBot.Modules.General
                 var target = User_Accounts.UserAccounts.GetAccount(user);
                 var embed = new EmbedBuilder();
                 embed.WithTitle("Stats")
-                    .AddField("Level:", target.LevelNumber)
-                    .AddField("Points:", target.Points)
-                    .AddField("HP Info:", $"{target.MaxHp} / {target.HP}");
-
+                    .AddField("Contrubution Points:", target.LoyaltyPoints);
                 await Context.Channel.SendMessageAsync($"{user.Mention}", false, embed.Build());
                 return;
             }
@@ -53,9 +50,7 @@ namespace PhoenixBot.Modules.General
                 var target = User_Accounts.UserAccounts.GetAccount(targetUser);
                 var embed = new EmbedBuilder();
                 embed.WithTitle("Stats")
-                    .AddField("Level:", target.LevelNumber)
-                    .AddField("Points:", target.Points)
-                    .AddField("HP Info:", $"Max HP: {target.MaxHp}! Current HP:{target.HP}");
+                    .AddField("Contrubution Points:", target.LoyaltyPoints);
                 await Context.Channel.SendMessageAsync($"{targetUser.Mention}", false, embed.Build());
                 return;
             }

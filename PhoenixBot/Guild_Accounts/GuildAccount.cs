@@ -9,18 +9,13 @@ namespace PhoenixBot
     {
         public ulong ID { get; set; }
         public int NumberOfTempChannels { get; set; }
-        // Points needed to increase these stats
-        public uint PointsForHealthIncrease { get; set; }
-        public uint PointsForHealth { get; set; }
-        public uint PointsForRevive { get; set; }
-        // Amount Increased
-        public uint HealthIncrease { get; set; }
-        public uint Health { get; set; }
 
         public DateTime DayChecked { get; set; }
 
         public bool DebateRunning { get; set; }
         public ulong StickHolderId { get; set; }
+
+        public bool AllowSummoning { get; set; }
         // Town Raffle
         public bool TownRaffleRunning { get; set; }
         public string TownRaffleInfo { get; set; }

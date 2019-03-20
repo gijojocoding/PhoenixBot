@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -9,7 +9,7 @@ namespace PhoenixBot.User_Accounts
 {
     public static class UserAccounts
     {
-        private static List<UserAccount> accounts;
+        internal static List<UserAccount> accounts;
         private static string accountsFile = "Resources/accounts.json";
 
 
@@ -55,11 +55,8 @@ namespace PhoenixBot.User_Accounts
             var newAccount = new UserAccount()
             {
                 ID = id,
-                HP = 100,
-                MaxHp = 100,
-                Points = 50,
+                LoyaltyPoints = 0,
                 NumberOfWarnings = 0,
-                IsAlive = true,
                 IsMuted = false
 
             };

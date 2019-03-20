@@ -14,7 +14,7 @@ namespace PhoenixBot
     {
         DiscordSocketClient _client;
         CommandService _service;
-        public IServiceProvider _provider;
+        IServiceProvider _provider;
         AudioService _audioService;
         Lavalink _lavalink;
 
@@ -68,10 +68,7 @@ namespace PhoenixBot
                 await context.Message.DeleteAsync();
                 return;
             }
-            //FactPost(context.Guild);
-            //Leveling Logic
             if (context.User.IsBot) return;
-            Leveling.UserSentMessage((SocketGuildUser)context.User, (SocketTextChannel)context.Channel);
             await HandleCommandAsync(msg);
 
         }

@@ -56,12 +56,10 @@ namespace PhoenixBot.Guild_Accounts
             {
                 ID = id,
                 NumberOfTempChannels = 0,
-                PointsForHealthIncrease = 500,
-                PointsForHealth = 50,
-                PointsForRevive = 20,
                 DayChecked = DateTime.Now,
                 DebateRunning = false,
                 StickHolderId = 0,
+                AllowSummoning = false,
                 GuildEvent1Running = false,
                 GuildEvent2Running = false,
                 TownEvent1Running = false,

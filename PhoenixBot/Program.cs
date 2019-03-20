@@ -6,6 +6,7 @@ using Discord;
 using PhoenixBot.Features;
 using Victoria;
 using Microsoft.Extensions.DependencyInjection;
+using PhoenixBot.Modules.Music;
 
 namespace PhoenixBot
 {
@@ -14,6 +15,7 @@ namespace PhoenixBot
         DiscordSocketClient _client;
         CommandHandler _handler;
         IServiceProvider _serviceProvider;
+
         AudioService _audioService;
         Lavalink _lavalink;
 
@@ -33,28 +35,34 @@ namespace PhoenixBot
             _handler = new CommandHandler();
             _lavalink = new Lavalink();
             _audioService = new AudioService(_lavalink);
-            _serviceProvider = BuildServiceProvider();
-            _client.Log += Log;
-            await _client.LoginAsync(TokenType.Bot, Config.bot.token);
-            await _client.StartAsync();
-            await _client.SetGameAsync(Config.bot.cmdPrefix + "help");
-            Global.Client = _client;
-            _client.Ready += EventReminder.EventTimeCheck;
-            _handler = new CommandHandler();
-            await _handler.InitializeAsynce(_client, _serviceProvider);
-            await Task.Delay(-1);
-
-        }
-        public IServiceProvider BuildServiceProvider()
-        {
-            IServiceProvider ServiceCollection = new ServiceCollection()
+            _serviceProvider = new ServiceCollection()
                 .AddSingleton(_client)
                 .AddSingleton(_handler)
                 .AddSingleton(_audioService)
                 .AddSingleton(_lavalink)
                 .BuildServiceProvider();
-            return ServiceCollection;
+            _lavalink = _serviceProvider.GetRequiredService<Lavalink>();
+
+
+
+            _client.Log += Log;
+            await _client.LoginAsync(TokenType.Bot, Config.bot.token);
+            await _client.StartAsync();
+            await _client.SetGameAsync(Config.bot.cmdPrefix + "help");
+            Global.Client = _client;
+            //_client.Ready += EventReminder.EventTimeCheck;
+            _client.Ready += OnReady;
+
+            await _handler.InitializeAsynce(_client, _serviceProvider);
+            await Task.Delay(-1);
+
         }
+        private async Task ClientReady()
+        {
+            await EventReminder.EventTimeCheck();
+
+        }
+
         public async Task Log(LogMessage msg)
         {
             Console.WriteLine(msg.Message);
