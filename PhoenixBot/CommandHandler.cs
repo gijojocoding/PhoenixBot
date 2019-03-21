@@ -5,6 +5,7 @@ using Discord;
 using System.Threading.Tasks;
 using System.Reflection;
 using PhoenixBot.User_Accounts;
+using PhoenixBot.Modules.Music;
 using Victoria;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -47,7 +48,6 @@ namespace PhoenixBot
         private async Task OnReady()
         {
             var node = await _lavalink.AddNodeAsync(_client).ConfigureAwait(false);
-            _audioService.Initialize(node);
         }
         private async Task PreCommandHandle(SocketMessage s)
         {

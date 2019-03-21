@@ -18,7 +18,6 @@ namespace PhoenixBot
 
         AudioService _audioService;
         Lavalink _lavalink;
-        LavaNode node;
 
         static void Main(string[] args)
             => new Program().StartAsync().GetAwaiter().GetResult();
@@ -31,17 +30,16 @@ namespace PhoenixBot
                 LogLevel = LogSeverity.Verbose
             });
             _handler = new CommandHandler();
-           _lavalink = new Lavalink();
+            _lavalink = new Lavalink();
             _audioService = new AudioService(_lavalink);
             _client.Ready += OnReady;
             _serviceProvider = new ServiceCollection()
-                .AddSingleton(_client)
-                .AddSingleton(_handler)
-                .AddSingleton(_audioService)
-                .AddSingleton(_lavalink)
-                .AddSingleton(node)
-                .BuildServiceProvider();
-            
+                                .AddSingleton(_client)
+                                .AddSingleton(_handler)
+                                .AddSingleton(_audioService)
+                                .AddSingleton(_lavalink)
+                                .BuildServiceProvider();
+
 
 
             _client.Log += Log;
@@ -70,11 +68,10 @@ namespace PhoenixBot
         {
             await EventReminder.EventTimeCheck();
 
-            _audioService.Initialize(node);
             try
             {
 
-                var node = await _lavalink.AddNodeAsync(_client).ConfigureAwait(false);
+                //var node = await _lavalink.AddNodeAsync(_client).ConfigureAwait(false);
 //                node.TrackFinished +=  _serviceProvider.GetService<AudioService>();
             }
             catch (Exception ex)

@@ -18,7 +18,7 @@ namespace PhoenixBot.Modules.General
         {
             var bot = Context.Guild.GetUser(Config.bot.botID);
             var voiceChannel = bot.VoiceChannel;
-            await AudioService.ConnectAndPlayAsync(voiceChannel, query);
+            await AudioService.JoinOrPlayAsync((SocketGuildUser) Context.User, Context.Channel, Context.Guild.Id, query);
         }
 
     }
