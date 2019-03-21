@@ -18,6 +18,7 @@ namespace PhoenixBot
 
         AudioService _audioService;
         Lavalink _lavalink;
+        LavaNode _node;
 
         static void Main(string[] args)
             => new Program().StartAsync().GetAwaiter().GetResult();
@@ -31,7 +32,8 @@ namespace PhoenixBot
             });
             _handler = new CommandHandler();
             _lavalink = new Lavalink();
-            _audioService = new AudioService(_lavalink);
+            //_node = _lavalink.DefaultNode;
+            _audioService = new AudioService(_lavalink, _node);
             _client.Ready += OnReady;
             _serviceProvider = new ServiceCollection()
                                 .AddSingleton(_client)

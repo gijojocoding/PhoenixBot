@@ -10,8 +10,9 @@ using Victoria.Entities.Enums;
 using PhoenixBot.Handlers;
 using System.Linq;
 using Discord.WebSocket;
+using PhoenixBot.Modules.Music;
 
-namespace PhoenixBot.Modules.Music
+namespace PhoenixBot
 {
     public class AudioService
     {

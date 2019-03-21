@@ -14,7 +14,7 @@ namespace PhoenixBot.Modules.Music
     public class AudioCommands : ModuleBase<SocketCommandContext>
     {
 
-        AudioService AudioService {  get;  set; }
+        AudioService AudioService { get; set; }
 
         [Command("Play", RunMode = RunMode.Default)]
         public async Task Play([Remainder]string search)
