@@ -1,14 +1,14 @@
-﻿
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 using Discord;
 using PhoenixBot.Features;
 using Victoria;
 using Microsoft.Extensions.DependencyInjection;
-using PhoenixBot.Modules.Music;
+using System.Reflection;
+using Discord.Commands;
 
-namespace PhoenixBot
+namespace PhoenixBot.Modules.Music
 {
     class Program
     {
@@ -17,8 +17,8 @@ namespace PhoenixBot
         IServiceProvider _serviceProvider;
 
         AudioService _audioService;
-        Lavalink _lavalink;
-        LavaNode _node;
+        LavaSocketClient _lavaSocketClient;
+        LavaRestClient _lavaRestClient;
 
         static void Main(string[] args)
             => new Program().StartAsync().GetAwaiter().GetResult();
@@ -31,19 +31,17 @@ namespace PhoenixBot
                 LogLevel = LogSeverity.Verbose
             });
             _handler = new CommandHandler();
-            _lavalink = new Lavalink();
-            //_node = _lavalink.DefaultNode;
-            _audioService = new AudioService(_lavalink, _node);
+            _lavaSocketClient = new LavaSocketClient();
+            _lavaRestClient = new LavaRestClient();
+            _audioService = new AudioService(_lavaSocketClient, _lavaRestClient);
             _client.Ready += OnReady;
             _serviceProvider = new ServiceCollection()
                                 .AddSingleton(_client)
                                 .AddSingleton(_handler)
                                 .AddSingleton(_audioService)
-                                .AddSingleton(_lavalink)
+                                .AddSingleton(_lavaSocketClient)
+                                .AddSingleton(_lavaRestClient)
                                 .BuildServiceProvider();
-
-
-
             _client.Log += Log;
             await _client.LoginAsync(TokenType.Bot, Config.bot.token);
             await _client.StartAsync();
@@ -53,7 +51,6 @@ namespace PhoenixBot
 
             await _handler.InitializeAsynce(_client, _serviceProvider);
             await Task.Delay(-1);
-
         }
         private async Task ClientReady()
         {
@@ -74,7 +71,7 @@ namespace PhoenixBot
             {
 
                 //var node = await _lavalink.AddNodeAsync(_client).ConfigureAwait(false);
-//                node.TrackFinished +=  _serviceProvider.GetService<AudioService>();
+                //                node.TrackFinished +=  _serviceProvider.GetService<AudioService>();
             }
             catch (Exception ex)
             {

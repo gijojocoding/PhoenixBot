@@ -17,8 +17,8 @@ namespace PhoenixBot
         CommandService _service { get; set; }
         IServiceProvider _provider { get; set; }
         AudioService _audioService { get; set; }
-        Lavalink _lavalink { get; set; }
-        AudioCommands audioCommands;
+        LavaSocketClient _lavaSocketClient { get; set; }
+        LavaRestClient _lavaRestClient { get; set; }
 
         private ulong GuildId_ = Config.bot.guildID;
         private ulong eventChannelID = ChannelIds.channels.eventID;
@@ -28,12 +28,11 @@ namespace PhoenixBot
             _client = client;
             _service = new CommandService();
             _provider = serviceProvider;
-            _lavalink = new Lavalink();
-            _audioService = new AudioService(_lavalink);
+            _audioService = new AudioService(_lavaSocketClient, _lavaRestClient);
             await _service.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             _client.MessageReceived += PreCommandHandle;
             _client.UserJoined += UserJoined;
-            _client.Ready += OnReady;
+           // _client.Ready += OnReady;
         }
         public async Task UserJoined(SocketGuildUser user)
         {
@@ -46,10 +45,10 @@ namespace PhoenixBot
                 $"If you represent a guild please enter `!Diplomat` in the joining channel. Thank you", false, dataEmbed.Build());
 
         }
-        private async Task OnReady()
+        /*private async Task OnReady()
         {
-            var node = await _lavalink.AddNodeAsync(_client).ConfigureAwait(false);
-        }
+            var node = await _lavaSocketClient. (_client).ConfigureAwait(false);
+        }*/
         private async Task PreCommandHandle(SocketMessage s)
         {
             var msg = s as SocketUserMessage;
