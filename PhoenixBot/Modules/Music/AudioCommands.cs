@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using Victoria;
 
 
@@ -13,10 +14,8 @@ namespace PhoenixBot.Modules.Music
     [RequireOwner]
     public class AudioCommands : ModuleBase<SocketCommandContext>
     {
-
-        AudioService AudioService { get; set; }
-
-        [Command("Play", RunMode = RunMode.Default)]
+        public  AudioService AudioService { get; set; }
+        [Command("Play", RunMode = RunMode.Async)]
         public async Task Play([Remainder]string search)
         {
             await AudioService.JoinOrPlayAsync((SocketGuildUser)Context.User, Context.Channel, Context.Guild.Id, search);

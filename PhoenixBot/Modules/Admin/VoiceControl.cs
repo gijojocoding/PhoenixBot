@@ -14,7 +14,7 @@ namespace PhoenixBot.Modules.Admin
         [Command("summon", RunMode = RunMode.Async)]
         async Task AdminJoinVoice()
         {
-            var selfBot = Global.Client.CurrentUser as SocketSelfUser;
+            var selfBot = Global.Client.GetUser(Config.bot.botID);
             Console.WriteLine(selfBot.Mention.ToString());
             var user = Context.User as IGuildUser;
             var voiceChannel = user.VoiceChannel;
@@ -25,10 +25,11 @@ namespace PhoenixBot.Modules.Admin
         [Command("dispel")]
         async Task AdminLeaveVoice()
         {
-            var user = Context.Guild.GetUser(Config.bot.botID);
+            var selfbot = Context.Guild.GetUser(Config.bot.botID) as SocketGuildUser;
+            var user = Context.User as SocketGuildUser;
             var voiceChannel = user.VoiceChannel;
             if (voiceChannel == null) return;
-            await voiceChannel.DisconnectAsync();
+            await selfbot.VoiceChannel.DisconnectAsync();
             await ReplyAsync($" n ");
             Console.WriteLine($"The bot has Left {voiceChannel.Name}");
         }

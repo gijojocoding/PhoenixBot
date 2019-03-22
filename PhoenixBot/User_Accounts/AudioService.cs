@@ -18,42 +18,95 @@ namespace PhoenixBot
     {
         private Lavalink _lavalink;
         private LavaNode _node;
+        //DiscordSocketClient _client { get; set; }
         public AudioService(Lavalink lavalink, LavaNode node = null)
         {
             _lavalink = lavalink;
             _node = node;
         }
-        DiscordSocketClient _client { get; set; }
-        private readonly Lazy<ConcurrentDictionary<ulong, AudioOptions>> _lazyOptions
-    = new Lazy<ConcurrentDictionary<ulong, AudioOptions>>();
+        #region Music Region
+        private readonly Lazy<ConcurrentDictionary<ulong, AudioOptions>> _lazyOptions = new Lazy<ConcurrentDictionary<ulong, AudioOptions>>();
 
-        private ConcurrentDictionary<ulong, AudioOptions> Options
-            => _lazyOptions.Value;
+        private ConcurrentDictionary<ulong, AudioOptions> Options => _lazyOptions.Value;
 
-        public async Task JoinOrPlayAsync(SocketGuildUser user, IMessageChannel textChannel, ulong guildId, string query = null)
+        public async Task<Embed> JoinOrPlayAsync(SocketGuildUser user, IMessageChannel textChannel, ulong guildId, string query = null)
         {
-            var tChannel = Global.Client.GetGuild(guildId).GetTextChannel(textChannel.Id);
+            LavaTrack track;
+            Console.WriteLine("In JoinOrPlayAsync");
             //Check If User Is Connected To Voice Cahnnel.
             if (user.VoiceChannel == null)
-            {
-                await tChannel.SendMessageAsync("Please join a voice channel that I have access to.");
-            }
-            LavaTrack track;
-            LavaPlayer player = _lavalink.DefaultNode.GetPlayer(guildId);
-            var node = await _lavalink.AddNodeAsync(_client);
-            await node.ConnectAsync(user.VoiceChannel);
-            var search = await _lavalink.DefaultNode.SearchYouTubeAsync(query);
-            if(player.IsPlaying == true)
-            if(search.LoadResultType == LoadResultType.NoMatches)
-            {
-                await tChannel.SendMessageAsync("I failed to find anything. Please try again or blame my Dev.");
-            }
+                return await EmbedHandler.CreateErrorEmbed("Music, Join/Play", "You Must First Join a Voice Channel.");
 
-            track = search.Tracks.FirstOrDefault();
-            await player.PlayAsync(track);
+            //Check if user who used !Join is a user that has already summoned the Bot.
+            /*if (Options.TryGetValue(user.Guild.Id, out var options) && options.Summoner.Id != user.Id)
+                return await EmbedHandler.CreateErrorEmbed("Music, Join/Play", $"I can't join another voice channel untill {options.Summoner} disconnects me.");*/
+
+            //If The user hasn't provided a Search string from the !Play command, then they must have used the !Join command.
+            //Join the voice channel the user is in.
+            if (query == null)
+            {
+                Console.WriteLine(query);
+                await _lavalink.DefaultNode.ConnectAsync(user.VoiceChannel, textChannel /*This Param is Optional, Only used If we want to bind the Bot to a TextChannel For commands.*/);
+                Options.TryAdd(user.Guild.Id, new AudioOptions
+                {
+                    Summoner = user
+                });
+                return await EmbedHandler.CreateBasicEmbed("Music", $"Now connected to {user.VoiceChannel.Name} and bound to {textChannel.Name}. Get Ready For Betrays...", Color.Blue);
+            }
+            else
+            {
+                Console.WriteLine("In else with query: " + query);
+                try
+                {
+                    Console.WriteLine("in try");
+                    //Try get the player. If it returns null then the user has used the command !Play without using the command !Join.
+                    var player = _lavalink.DefaultNode.GetPlayer(guildId);
+                    if (player == null)
+                    {
+                        Console.WriteLine("Player is null.");
+                        //User Used Command !Play before they used !Join
+                        //So We Create a Connection To The Users Voice Channel.
+                        await _lavalink.DefaultNode.ConnectAsync(user.VoiceChannel, textChannel);
+                        Options.TryAdd(user.Guild.Id, new AudioOptions
+                        {
+                            Summoner = user
+                        });
+                        //Now we can set the player to out newly created player.
+                        player = _lavalink.DefaultNode.GetPlayer(guildId);
+                    }
+
+                    //Find The Youtube Track the User requested.
+
+                    var search = await _lavalink.DefaultNode.SearchYouTubeAsync(query);
+                    Console.WriteLine(search);
+                    //If we couldn't find anything, tell the user.
+                    if (search.LoadResultType == LoadResultType.NoMatches)
+                        return await EmbedHandler.CreateErrorEmbed("Music", $"BAMBOOZLED! I wasn't able to find anything for {query}.");
+
+                    //Get the first track from the search results.
+                    //TODO: Add a 1-5 list for the user to pick from. (Like Fredboat)
+                    track = search.Tracks.FirstOrDefault();
+
+                    //If the Bot is already playing music, or if it is paused but still has music in the playlist, Add the requested track to the queue.
+                    if (player.CurrentTrack != null && player.IsPlaying || !player.IsPlaying)
+                    {
+                        Console.WriteLine(player.CurrentTrack);
+                        player.Queue.Enqueue(track);
+                        return await EmbedHandler.CreateBasicEmbed("Music", $"{track.Title} has been added to queue.", Color.Blue);
+                    }
+                    //Player was not playing anything, so lets play the requested track.
+                    await player.PlayAsync(track);
+                    return await EmbedHandler.CreateBasicEmbed("Music", $"Now Playing: {track.Title}\nUrl: {track.Uri}", Color.Blue);
+                }
+                //If after all the checks we did, something still goes wrong. Tell the user about it so they can report it back to us.
+                catch (Exception ex)
+                {
+                    await textChannel.SendMessageAsync("Error: " + ex);
+                    return await EmbedHandler.CreateErrorEmbed("Music, Join/Play", ex.ToString());
+                }
+            }
 
         }
-
 
         /*This is ran when a user uses the command Leave.
             Task Returns an Embed which is used in the command call. */
@@ -80,6 +133,8 @@ namespace PhoenixBot
             }
         }
 
+        /*This is ran when a user uses the command List 
+            Task Returns an Embed which is used in the command call. */
         public async Task<Embed> ListAsync(ulong guildId)
         {
             try
@@ -90,7 +145,7 @@ namespace PhoenixBot
                 /* Get The Player and make sure it isn't null. */
                 var player = _lavalink.DefaultNode.GetPlayer(guildId);
                 if (player == null)
-                    return await EmbedHandler.CreateErrorEmbed("Music, List", $"Could not aquire player.\nAre you using the bot right now? check {Config.bot.cmdPrefix}Help for info on how to use the bot.");
+                    return await EmbedHandler.CreateErrorEmbed("Music, List", $"Could not aquire player.\nAre you using the bot right now? checkm{Config.bot.cmdPrefix}Help for info on how to use the bot.");
 
                 if (player.IsPlaying)
                 {
@@ -215,7 +270,7 @@ namespace PhoenixBot
             try
             {
                 var player = _lavalink.DefaultNode.GetPlayer(guildId);
-                if (player.IsPlaying)
+                if (!player.IsPlaying)
                 {
                     await player.PauseAsync();
                     return $"**Resumed:** Now Playing {player.CurrentTrack.Title}";
@@ -235,7 +290,7 @@ namespace PhoenixBot
             try
             {
                 var player = _lavalink.DefaultNode.GetPlayer(guildId);
-                if (!player.IsPlaying)
+                if (player.IsPlaying)
                     await player.PauseAsync();
                 return $"**Resumed:** {player.CurrentTrack.Title}";
             }
@@ -261,5 +316,6 @@ namespace PhoenixBot
                 await player.TextChannel.SendMessageAsync("", false, await EmbedHandler.CreateBasicEmbed("Now Playing", $"[{nextTrack.Title}]({nextTrack.Uri})", Color.Blue));
             }
         }
+#endregion
     }
 }

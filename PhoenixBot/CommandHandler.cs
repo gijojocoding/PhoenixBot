@@ -18,6 +18,7 @@ namespace PhoenixBot
         IServiceProvider _provider { get; set; }
         AudioService _audioService { get; set; }
         Lavalink _lavalink { get; set; }
+        AudioCommands audioCommands;
 
         private ulong GuildId_ = Config.bot.guildID;
         private ulong eventChannelID = ChannelIds.channels.eventID;
