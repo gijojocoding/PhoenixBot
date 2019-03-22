@@ -19,6 +19,7 @@ namespace PhoenixBot.Modules.Music
         AudioService _audioService;
         LavaSocketClient _lavaSocketClient;
         LavaRestClient _lavaRestClient;
+        LavaPlayer _player;
 
         static void Main(string[] args)
             => new Program().StartAsync().GetAwaiter().GetResult();

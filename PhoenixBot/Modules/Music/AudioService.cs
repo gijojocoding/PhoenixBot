@@ -6,6 +6,7 @@ using Victoria.Entities;
 using System.Linq;
 using Discord.WebSocket;
 using PhoenixBot.Modules.Music;
+using System;
 
 namespace PhoenixBot
 {
@@ -24,42 +25,46 @@ namespace PhoenixBot
         [Command("Join", RunMode = RunMode.Async)]
         public async Task Join()
         {
-            try {
+
                 var user = Context.User as SocketGuildUser;
                 var userVoiceChannel = user.VoiceChannel;
                 await _lavaSocketClient.ConnectAsync(userVoiceChannel);
                 await ReplyAsync("Connected!");
-            }
-            catch
-            {
-                await ReplyAsyncikooooo
-            }
+
         }
 
 
         [Command("Play", RunMode = RunMode.Async)]
         public async Task PlayAsync([Remainder] string query)
         {
-
-            var search = await _lavaRestClient.SearchYouTubeAsync(query);
-            if (search.LoadType == LoadType.NoMatches ||
-                search.LoadType == LoadType.LoadFailed)
+            Console.WriteLine("In play command.");
+            try
             {
-                await ReplyAsync("Nothing found");
-                return;
+                var search = await _lavaRestClient.SearchYouTubeAsync(query);
+                if (search.LoadType == LoadType.NoMatches ||
+                    search.LoadType == LoadType.LoadFailed)
+                {
+                    await ReplyAsync("Nothing found");
+                    return;
+                }
+
+                var track = search.Tracks.FirstOrDefault();
+                Console.WriteLine(_player.VoiceChannel + "" + _player.CurrentTrack);
+                Console.WriteLine(track);
+                if (_player.IsPlaying)
+                {
+                    _player.Queue.Enqueue(track);
+                    await ReplyAsync($"{track.Title} has been queued.");
+                }
+                else
+                {
+                    await _player.PlayAsync(track);
+                    await ReplyAsync($"Now Playing: {track.Title}");
+                }
             }
-
-            var track = search.Tracks.FirstOrDefault();
-
-            if (_player.IsPlaying)
+            catch (Exception ex)
             {
-                _player.Queue.Enqueue(track);
-                await ReplyAsync($"{track.Title} has been queued.");
-            }
-            else
-            {
-                await _player.PlayAsync(track);
-                await ReplyAsync($"Now Playing: {track.Title}");
+                await ReplyAsync("Error: " + ex);
             }
         }
 
