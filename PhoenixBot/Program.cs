@@ -15,11 +15,9 @@ namespace PhoenixBot.Modules.Music
         DiscordSocketClient _client;
         CommandHandler _handler;
         IServiceProvider _serviceProvider;
-
         AudioService _audioService;
         LavaSocketClient _lavaSocketClient;
         LavaRestClient _lavaRestClient;
-        LavaPlayer _player;
 
         static void Main(string[] args)
             => new Program().StartAsync().GetAwaiter().GetResult();
@@ -43,12 +41,13 @@ namespace PhoenixBot.Modules.Music
                                 .AddSingleton(_lavaSocketClient)
                                 .AddSingleton(_lavaRestClient)
                                 .BuildServiceProvider();
+                                
             _client.Log += Log;
             await _client.LoginAsync(TokenType.Bot, Config.bot.token);
             await _client.StartAsync();
             await _client.SetGameAsync(Config.bot.cmdPrefix + "help");
             Global.Client = _client;
-            //_client.Ready += EventReminder.EventTimeCheck;
+            _client.Ready += EventReminder.EventTimeCheck;
 
             await _handler.InitializeAsynce(_client, _serviceProvider);
             await Task.Delay(-1);
@@ -56,7 +55,6 @@ namespace PhoenixBot.Modules.Music
         private async Task ClientReady()
         {
             await EventReminder.EventTimeCheck();
-
         }
 
         public async Task Log(LogMessage msg)
@@ -70,9 +68,7 @@ namespace PhoenixBot.Modules.Music
 
             try
             {
-
-                //var node = await _lavalink.AddNodeAsync(_client).ConfigureAwait(false);
-                //                node.TrackFinished +=  _serviceProvider.GetService<AudioService>();
+                
             }
             catch (Exception ex)
             {

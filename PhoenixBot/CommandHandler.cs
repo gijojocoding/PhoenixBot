@@ -32,7 +32,6 @@ namespace PhoenixBot
             await _service.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             _client.MessageReceived += PreCommandHandle;
             _client.UserJoined += UserJoined;
-           // _client.Ready += OnReady;
         }
         public async Task UserJoined(SocketGuildUser user)
         {
@@ -45,10 +44,6 @@ namespace PhoenixBot
                 $"If you represent a guild please enter `!Diplomat` in the joining channel. Thank you", false, dataEmbed.Build());
 
         }
-        /*private async Task OnReady()
-        {
-            var node = await _lavaSocketClient. (_client).ConfigureAwait(false);
-        }*/
         private async Task PreCommandHandle(SocketMessage s)
         {
             var msg = s as SocketUserMessage;

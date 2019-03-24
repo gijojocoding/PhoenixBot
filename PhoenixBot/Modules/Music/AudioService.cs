@@ -7,6 +7,7 @@ using System.Linq;
 using Discord.WebSocket;
 using PhoenixBot.Modules.Music;
 using System;
+using System.Collections.Generic;
 
 namespace PhoenixBot
 {
@@ -15,7 +16,6 @@ namespace PhoenixBot
         private LavaPlayer _player;
         private LavaSocketClient _lavaSocketClient;
         private LavaRestClient _lavaRestClient;
-        //DiscordSocketClient _client { get; set; }
         public AudioService(LavaSocketClient lavaSocketClient, LavaRestClient lavaRestClient)
         {
             _lavaSocketClient = lavaSocketClient;
@@ -25,11 +25,19 @@ namespace PhoenixBot
         [Command("Join", RunMode = RunMode.Async)]
         public async Task Join()
         {
-
+            try
+            {
                 var user = Context.User as SocketGuildUser;
                 var userVoiceChannel = user.VoiceChannel;
-                await _lavaSocketClient.ConnectAsync(userVoiceChannel);
+                await userVoiceChannel.ConnectAsync();
+                LavaPlayer _player = _lavaSocketClient.GetPlayer(Config.bot.guildID);
+
                 await ReplyAsync("Connected!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
 
         }
 
@@ -37,7 +45,6 @@ namespace PhoenixBot
         [Command("Play", RunMode = RunMode.Async)]
         public async Task PlayAsync([Remainder] string query)
         {
-            Console.WriteLine("In play command.");
             try
             {
                 var search = await _lavaRestClient.SearchYouTubeAsync(query);
@@ -49,8 +56,7 @@ namespace PhoenixBot
                 }
 
                 var track = search.Tracks.FirstOrDefault();
-                Console.WriteLine(_player.VoiceChannel + "" + _player.CurrentTrack);
-                Console.WriteLine(track);
+
                 if (_player.IsPlaying)
                 {
                     _player.Queue.Enqueue(track);
@@ -61,23 +67,31 @@ namespace PhoenixBot
                     await _player.PlayAsync(track);
                     await ReplyAsync($"Now Playing: {track.Title}");
                 }
-            }
-            catch (Exception ex)
+            } catch (Exception ex)
             {
-                await ReplyAsync("Error: " + ex);
+                await ReplyAsync(ex.ToString());
             }
         }
 
         [Command("Disconnect")]
         public async Task StopAsync()
         {
-            await _lavaSocketClient.DisconnectAsync(_player.VoiceChannel);
-            await ReplyAsync("Disconnected!");
+            try
+            {
+                var user = Context.User as SocketGuildUser;
+                await user.VoiceChannel.DisconnectAsync();
+                await ReplyAsync("Disconnected!");
+            }
+            catch (Exception ex)
+            {
+                await ReplyAsync(ex.ToString());
+            }
         }
 
         [Command("Skip")]
         public async Task SkipAsync()
         {
+            LavaPlayer _player = _lavaSocketClient.GetPlayer(Config.bot.guildID);
             try
             {
                 var skipped = await _player.SkipAsync();
@@ -92,6 +106,8 @@ namespace PhoenixBot
         [Command("NowPlaying")]
         public async Task NowPlaying()
         {
+            LavaPlayer _player = _lavaSocketClient.GetPlayer(Config.bot.guildID);
+
             if (_player.CurrentTrack is null)
             {
                 await ReplyAsync("There is no track playing right now.");
@@ -113,6 +129,8 @@ namespace PhoenixBot
         [Command("Lyrics")]
         public async Task LyricsAsync()
         {
+            LavaPlayer _player = _lavaSocketClient.GetPlayer(Config.bot.guildID);
+
             if (_player.CurrentTrack is null)
             {
                 await ReplyAsync("There is no track playing right now.");
@@ -132,6 +150,8 @@ namespace PhoenixBot
         [Command("Queue")]
         public Task Queue()
         {
+            LavaPlayer _player = _lavaSocketClient.GetPlayer(Config.bot.guildID);
+
             var tracks = _player.Queue.Items.Cast<LavaTrack>().Select(x => x.Title);
             return ReplyAsync(tracks.Count() is 0 ?
                 "No tracks in queue." : string.Join("\n", tracks));
