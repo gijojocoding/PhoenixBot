@@ -20,9 +20,15 @@ namespace PhoenixBot
         {
             _lavaSocketClient = lavaSocketClient;
             _lavaRestClient = lavaRestClient;
+           
         }
-        #region Music Region
-        [Command("Join", RunMode = RunMode.Async)]
+
+        protected override void BeforeExecute(CommandInfo command)
+        {
+            _player = _lavaSocketClient.GetPlayer(Context.Guild.Id);
+            base.BeforeExecute(command);
+        }
+        [Command("Join"), AudioProviso]
         public async Task Join()
         {
             try
@@ -30,7 +36,6 @@ namespace PhoenixBot
                 var user = Context.User as SocketGuildUser;
                 var userVoiceChannel = user.VoiceChannel;
                 await userVoiceChannel.ConnectAsync();
-                LavaPlayer _player = _lavaSocketClient.GetPlayer(Config.bot.guildID);
 
                 await ReplyAsync("Connected!");
             }
@@ -156,6 +161,6 @@ namespace PhoenixBot
             return ReplyAsync(tracks.Count() is 0 ?
                 "No tracks in queue." : string.Join("\n", tracks));
         }
-        #endregion
+
     }
 }

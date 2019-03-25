@@ -33,21 +33,21 @@ namespace PhoenixBot.Modules.Music
             _lavaSocketClient = new LavaSocketClient();
             _lavaRestClient = new LavaRestClient();
             _audioService = new AudioService(_lavaSocketClient, _lavaRestClient);
-            _client.Ready += OnReady;
             _serviceProvider = new ServiceCollection()
-                                .AddSingleton(_client)
-                                .AddSingleton(_handler)
-                                .AddSingleton(_audioService)
-                                .AddSingleton(_lavaSocketClient)
-                                .AddSingleton(_lavaRestClient)
-                                .BuildServiceProvider();
+                               .AddSingleton(_client)
+                               .AddSingleton(_handler)
+                               .AddSingleton(_audioService)
+                               .AddSingleton(_lavaSocketClient)
+                               .AddSingleton(_lavaRestClient)
+                               .BuildServiceProvider();
+            _client.Ready += OnReady;
+           
                                 
             _client.Log += Log;
             await _client.LoginAsync(TokenType.Bot, Config.bot.token);
             await _client.StartAsync();
             await _client.SetGameAsync(Config.bot.cmdPrefix + "help");
             Global.Client = _client;
-            _client.Ready += EventReminder.EventTimeCheck;
 
             await _handler.InitializeAsynce(_client, _serviceProvider);
             await Task.Delay(-1);
