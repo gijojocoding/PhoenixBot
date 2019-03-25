@@ -41,8 +41,8 @@ namespace PhoenixBot.Modules.Music
                                .AddSingleton(_lavaRestClient)
                                .BuildServiceProvider();
             _client.Ready += OnReady;
-           
-                                
+
+                    
             _client.Log += Log;
             await _client.LoginAsync(TokenType.Bot, Config.bot.token);
             await _client.StartAsync();
@@ -65,7 +65,11 @@ namespace PhoenixBot.Modules.Music
         private async Task OnReady()
         {
             await EventReminder.EventTimeCheck();
-
+            await _lavaSocketClient.StartAsync(_client, new Configuration {
+                LogSeverity = LogSeverity.Verbose,
+                ReconnectAttempts = 3,
+                ReconnectInterval = TimeSpan.FromSeconds(5)
+            });
             try
             {
                 

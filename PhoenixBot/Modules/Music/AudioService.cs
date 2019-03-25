@@ -35,8 +35,9 @@ namespace PhoenixBot
             {
                 var user = Context.User as SocketGuildUser;
                 var userVoiceChannel = user.VoiceChannel;
-                await userVoiceChannel.ConnectAsync();
-
+                //await userVoiceChannel.ConnectAsync();
+                await _lavaSocketClient.ConnectAsync(user.VoiceChannel);
+                 _lavaSocketClient.GetPlayer(Config.bot.guildID);
                 await ReplyAsync("Connected!");
             }
             catch (Exception ex)
@@ -47,11 +48,13 @@ namespace PhoenixBot
         }
 
 
-        [Command("Play", RunMode = RunMode.Async)]
+        [Command("Play")]
         public async Task PlayAsync([Remainder] string query)
         {
             try
             {
+                //var user = Context
+                _player = _lavaSocketClient.GetPlayer(Context.Guild.Id);
                 var search = await _lavaRestClient.SearchYouTubeAsync(query);
                 if (search.LoadType == LoadType.NoMatches ||
                     search.LoadType == LoadType.LoadFailed)
