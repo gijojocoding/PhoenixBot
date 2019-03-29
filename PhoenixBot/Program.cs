@@ -7,6 +7,7 @@ using Victoria;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Discord.Commands;
+using Victoria.Entities;
 
 namespace PhoenixBot.Modules.Music
 {
@@ -41,8 +42,7 @@ namespace PhoenixBot.Modules.Music
                                .AddSingleton(_lavaRestClient)
                                .BuildServiceProvider();
             _client.Ready += OnReady;
-
-                    
+            _lavaSocketClient.OnTrackFinished += OnTrackFinishedAsync;
             _client.Log += Log;
             await _client.LoginAsync(TokenType.Bot, Config.bot.token);
             await _client.StartAsync();
@@ -52,6 +52,16 @@ namespace PhoenixBot.Modules.Music
             await _handler.InitializeAsynce(_client, _serviceProvider);
             await Task.Delay(-1);
         }
+
+        private async Task OnTrackFinishedAsync(LavaPlayer player, LavaTrack track, TrackEndReason reason)
+        {
+            if (!reason.ShouldPlayNext()) return;
+            if (!player.Queue.TryDequeue(out var item) || !(item is LavaTrack nextTrack))
+                return;
+            await player.PlayAsync(nextTrack);
+            
+
+        }
         private async Task ClientReady()
         {
             await EventReminder.EventTimeCheck();
@@ -60,7 +70,6 @@ namespace PhoenixBot.Modules.Music
         public async Task Log(LogMessage msg)
         {
             Console.WriteLine(msg.Message);
-
         }
         private async Task OnReady()
         {
@@ -70,14 +79,6 @@ namespace PhoenixBot.Modules.Music
                 ReconnectAttempts = 3,
                 ReconnectInterval = TimeSpan.FromSeconds(5)
             });
-            try
-            {
-                
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
         }
     }
 }

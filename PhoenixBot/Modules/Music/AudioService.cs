@@ -5,56 +5,42 @@ using Victoria;
 using Victoria.Entities;
 using System.Linq;
 using Discord.WebSocket;
-using PhoenixBot.Modules.Music;
 using System;
-using System.Collections.Generic;
 
 namespace PhoenixBot
 {
     public class AudioService : ModuleBase<SocketCommandContext>
     {
-        private LavaPlayer _player;
-        private LavaSocketClient _lavaSocketClient;
-        private LavaRestClient _lavaRestClient;
+        private LavaPlayer _player { get; set; }
+        private LavaSocketClient _lavaSocketClient { get; set; }
+        private LavaRestClient _lavaRestClient { get; set; }
         public AudioService(LavaSocketClient lavaSocketClient, LavaRestClient lavaRestClient)
         {
             _lavaSocketClient = lavaSocketClient;
             _lavaRestClient = lavaRestClient;
-           
         }
 
-        protected override void BeforeExecute(CommandInfo command)
-        {
-            _player = _lavaSocketClient.GetPlayer(Context.Guild.Id);
-            base.BeforeExecute(command);
-        }
-        [Command("Join"), AudioProviso]
+        //protected override void BeforeExecute(CommandInfo command)
+        //{
+        //    _player = _lavaSocketClient.GetPlayer(Context.Guild.Id);
+        //    base.BeforeExecute(command);
+        //}
+        [Command("Join", RunMode = RunMode.Async), AudioProviso(playerCheck: false)]
         public async Task Join()
         {
-            try
-            {
-                var user = Context.User as SocketGuildUser;
-                var userVoiceChannel = user.VoiceChannel;
-                //await userVoiceChannel.ConnectAsync();
-                await _lavaSocketClient.ConnectAsync(user.VoiceChannel);
-                 _lavaSocketClient.GetPlayer(Config.bot.guildID);
-                await ReplyAsync("Connected!");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-
+            var user = (SocketGuildUser) Context.User;
+            var voiceChannel = user.VoiceChannel;
+            await voiceChannel.ConnectAsync();
+            await _lavaSocketClient.ConnectAsync(voiceChannel, textChannel: (ITextChannel)Context.Channel);
+            await ReplyAsync("Connected!");
         }
 
 
-        [Command("Play")]
+        [Command("Play", RunMode = RunMode.Async)]
         public async Task PlayAsync([Remainder] string query)
         {
-            try
-            {
-                //var user = Context
-                _player = _lavaSocketClient.GetPlayer(Context.Guild.Id);
+
+                //_player = _lavaSocketClient.GetPlayer(Context.Guild.Id);
                 var search = await _lavaRestClient.SearchYouTubeAsync(query);
                 if (search.LoadType == LoadType.NoMatches ||
                     search.LoadType == LoadType.LoadFailed)
@@ -75,10 +61,6 @@ namespace PhoenixBot
                     await _player.PlayAsync(track);
                     await ReplyAsync($"Now Playing: {track.Title}");
                 }
-            } catch (Exception ex)
-            {
-                await ReplyAsync(ex.ToString());
-            }
         }
 
         [Command("Disconnect")]
@@ -100,15 +82,9 @@ namespace PhoenixBot
         public async Task SkipAsync()
         {
             LavaPlayer _player = _lavaSocketClient.GetPlayer(Config.bot.guildID);
-            try
-            {
+
                 var skipped = await _player.SkipAsync();
                 await ReplyAsync($"Skipped: {skipped.Title}\nNow Playing: {_player.CurrentTrack.Title}");
-            }
-            catch
-            {
-                await ReplyAsync("There are no more items left in queue.");
-            }
         }
 
         [Command("NowPlaying")]
