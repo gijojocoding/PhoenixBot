@@ -3,11 +3,9 @@ using System;
 using System.Threading.Tasks;
 using Discord;
 using PhoenixBot.Features;
-using Victoria;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
-using Discord.Commands;
-using Victoria.Entities;
+using System.Data;
+using MySql.Data;
 
 namespace PhoenixBot.Modules.Music
 {
@@ -16,9 +14,7 @@ namespace PhoenixBot.Modules.Music
         DiscordSocketClient _client;
         CommandHandler _handler;
         IServiceProvider _serviceProvider;
-        AudioService _audioService;
-        LavaSocketClient _lavaSocketClient;
-        LavaRestClient _lavaRestClient;
+        //IDbConnection _dbConnection;
 
         static void Main(string[] args)
             => new Program().StartAsync().GetAwaiter().GetResult();
@@ -31,40 +27,34 @@ namespace PhoenixBot.Modules.Music
                 LogLevel = LogSeverity.Verbose
             });
             _handler = new CommandHandler();
-            _lavaSocketClient = new LavaSocketClient();
-            _lavaRestClient = new LavaRestClient();
-            _audioService = new AudioService(_lavaSocketClient, _lavaRestClient);
+            //_dbConnection = DataBaseHandler.GetConnection();
             _serviceProvider = new ServiceCollection()
                                .AddSingleton(_client)
+                               //.AddSingleton(_dbConnection)
                                .AddSingleton(_handler)
-                               .AddSingleton(_audioService)
-                               .AddSingleton(_lavaSocketClient)
-                               .AddSingleton(_lavaRestClient)
                                .BuildServiceProvider();
             _client.Ready += OnReady;
-            _lavaSocketClient.OnTrackFinished += OnTrackFinishedAsync;
             _client.Log += Log;
             await _client.LoginAsync(TokenType.Bot, Config.bot.token);
             await _client.StartAsync();
             await _client.SetGameAsync(Config.bot.cmdPrefix + "help");
             Global.Client = _client;
+            _client.Connected += ConnectedLog;
 
             await _handler.InitializeAsynce(_client, _serviceProvider);
             await Task.Delay(-1);
         }
 
-        private async Task OnTrackFinishedAsync(LavaPlayer player, LavaTrack track, TrackEndReason reason)
-        {
-            if (!reason.ShouldPlayNext()) return;
-            if (!player.Queue.TryDequeue(out var item) || !(item is LavaTrack nextTrack))
-                return;
-            await player.PlayAsync(nextTrack);
-            
 
+        private async Task ConnectedLog()
+        {
+            Console.WriteLine($"Connected at: {DateTime.Now}");
         }
+
         private async Task ClientReady()
         {
             await EventReminder.EventTimeCheck();
+
         }
 
         public async Task Log(LogMessage msg)
@@ -74,11 +64,11 @@ namespace PhoenixBot.Modules.Music
         private async Task OnReady()
         {
             await EventReminder.EventTimeCheck();
-            await _lavaSocketClient.StartAsync(_client, new Configuration {
-                LogSeverity = LogSeverity.Verbose,
-                ReconnectAttempts = 3,
-                ReconnectInterval = TimeSpan.FromSeconds(5)
-            });
+        }
+        public void CloseBot()
+        {
+            var code = Environment.ExitCode;
+            Environment.Exit(code);
         }
     }
 }

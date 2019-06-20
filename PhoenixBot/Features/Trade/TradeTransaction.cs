@@ -13,6 +13,7 @@ namespace PhoenixBot.Features.Trade
         public string item { get; set; }
         public string amount { get; set; }
         public string price { get; set; }
+        public string TradeID { get; set; }
     }
     public enum TransactionType
     {

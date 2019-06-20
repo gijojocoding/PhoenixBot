@@ -21,21 +21,12 @@ namespace PhoenixBot.Modules.Admin
             {
                 guild.TownEvent1Name = name;
                 guild.TownEvent1Running = true;
-                guild.TownEvent1HourWarning = false;
                 guild.TownEvent1TenMinuteWarning = false;
                 guild.TownEvent1Time = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
             }
-            else if (guild.TownEvent2Running == false)
-            {
-                guild.TownEvent2Name = name;
-                guild.TownEvent2Running = true;
-                guild.TownEvent2HourWarning = false;
-                guild.TownEvent2TenMinuteWarning = false;
-                guild.TownEvent2Time= new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
-            }
             else
             {
-                await ReplyAsync("Error 404: Two Town Events are already set.");
+                await ReplyAsync("Error 404: A Town Event is already set.");
             }
         }
         [Command("AddGuildEvent")]
@@ -47,21 +38,12 @@ namespace PhoenixBot.Modules.Admin
             {
                 guild.GuildEvent1Name = name;
                 guild.GuildEvent1Running = true;
-                guild.GuildEvent1HourWarning = false;
                 guild.GuildEvent1TenMinuteWarning = false;
                 guild.GuildEvent1Time= new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
             }
-            else if (guild.GuildEvent2Running == false)
-            {
-                guild.GuildEvent2Name = name;
-                guild.GuildEvent2Running = true;
-                guild.GuildEvent2HourWarning = false;
-                guild.GuildEvent2TenMinuteWarning = false;
-                guild.GuildEvent2Time = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
-            }
             else
             {
-                await ReplyAsync("Error 404: Two Guild Events are already set.");
+                await ReplyAsync("Error 404: A Guild Event is already set.");
             }
         }
         [Command("SetGroupEvent")]
@@ -71,15 +53,59 @@ namespace PhoenixBot.Modules.Admin
             var guild = GuildAccounts.GetAccount(Context.Guild);
             if (guild.GroupEventRunning == false)
             {
-                guild.GuildEvent2Name = name;
-                guild.GuildEvent2Running = true;
-                guild.GuildEvent2HourWarning = false;
-                guild.GuildEvent2TenMinuteWarning = false;
-                guild.GuildEvent2Time = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
+                guild.GroupEventName = name;
+                guild.GroupEventRunning = true;
+                guild.GroupEventTenMinuteWarning = false;
+                guild.GroupEventTime = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
             }
             else
             {
                 await ReplyAsync("Error 404: A Group Event is already set.");
+            }
+        }
+        [Command("RemoveTownEvent")]
+        async Task RemoveTownEvent()
+        {
+            var guild = GuildAccounts.GetAccount(Context.Guild);
+            if(guild.GroupEventRunning == true)
+            {
+                guild.TownEvent1Name = null;
+                guild.TownEvent1Running = false;
+                guild.TownEvent1TenMinuteWarning = false;
+            }
+            else
+            {
+                await ReplyAsync("Error 404: There was no Town Event set.");
+            }
+        }
+        [Command("RemoveGuildEvent")]
+        async Task RemoveGuildEvent()
+        {
+            var guild = GuildAccounts.GetAccount(Context.Guild);
+            if (guild.GuildEvent1Running == true)
+            {
+                guild.GuildEvent1Name = null;
+                guild.GuildEvent1Running = false;
+                guild.GuildEvent1TenMinuteWarning = false;
+            }
+            else
+            {
+                await ReplyAsync("Error 404: There was no Guild Event set.");
+            }
+        }
+        [Command("RemoveGrouEvent")]
+        async Task RemoveGroupEvent()
+        {
+            var guild = GuildAccounts.GetAccount(Context.Guild);
+            if (guild.GuildEvent1Running == true)
+            {
+                guild.GroupEventName = null;
+                guild.GuildEvent1Running = false;
+                guild.GuildEvent1TenMinuteWarning = false;
+            }
+            else
+            {
+                await ReplyAsync("Error 404: There was no Group Event set.");
             }
         }
     }

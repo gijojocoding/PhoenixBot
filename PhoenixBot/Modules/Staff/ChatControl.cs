@@ -1,4 +1,4 @@
-﻿using System;
+﻿using PhoenixBot;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
@@ -8,6 +8,7 @@ using Discord.WebSocket;
 namespace PhoenixBot.Modules.Staff
 {
     [Group("Staff")]
+    [RequireUserPermission(GuildPermission.SendTTSMessages)]
     public class ChatControl : ModuleBase<SocketCommandContext>
     {
         [Command("Mute")]
@@ -22,6 +23,12 @@ namespace PhoenixBot.Modules.Staff
 
             if (RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) || RoleCheck.HasChiefRole((SocketGuildUser)Context.User) || Context.User.Id == Context.Guild.Owner.Id)
             {
+                //var target = user as SocketGuildUser;
+                if (target == Context.Guild.Owner)
+                {
+                    await Context.User.SendMessageAsync("You can not mute the owner.");
+                    return;
+                }
                 if (reason == "" || reason == null || reason == " ")
                 {
                     await Context.Channel.SendMessageAsync("Failed to provide reason for the command.");

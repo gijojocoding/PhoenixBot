@@ -28,6 +28,5 @@ namespace PhoenixBot.User_Accounts
         {
             return File.Exists(filePath);
         }
-
     }
 }

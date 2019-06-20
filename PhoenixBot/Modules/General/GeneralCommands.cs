@@ -30,31 +30,7 @@ namespace PhoenixBot.Modules.General
                 await dmChannel.SendMessageAsync("", false, dataEmbed.Build());
             }
         }
-        [Command("Stats")]
-        [Summary("Gets the stats about the user, or the person tagged. ")]
-        public async Task Stats(SocketGuildUser user = null)
-        {
-            if (Context.IsPrivate == true) return;
-            if (user != null)
-            {
-                var target = User_Accounts.UserAccounts.GetAccount(user);
-                var embed = new EmbedBuilder();
-                embed.WithTitle("Stats")
-                    .AddField("Contrubution Points:", target.LoyaltyPoints);
-                await Context.Channel.SendMessageAsync($"{user.Mention}", false, embed.Build());
-                return;
-            }
-            else
-            {
-                var targetUser = Context.User;
-                var target = User_Accounts.UserAccounts.GetAccount(targetUser);
-                var embed = new EmbedBuilder();
-                embed.WithTitle("Stats")
-                    .AddField("Contrubution Points:", target.LoyaltyPoints);
-                await Context.Channel.SendMessageAsync($"{targetUser.Mention}", false, embed.Build());
-                return;
-            }
-        }
+
         [Command("Bot")]
         [Summary("Posts info about the bot. Does **NOT** include the change log.")]
         public async Task BotInfo()

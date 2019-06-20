@@ -14,7 +14,6 @@ namespace PhoenixBot
 
         public static BotConfig bot;
 
-
         static Config()
         {
             if (!Directory.Exists(configFolder)) Directory.CreateDirectory(configFolder);
@@ -30,6 +29,7 @@ namespace PhoenixBot
                 bot = JsonConvert.DeserializeObject<BotConfig>(json);
             }
         }
+        
     }
     public struct BotConfig
     {
@@ -39,5 +39,14 @@ namespace PhoenixBot
         public ulong guildID;
         // bot ID
         public ulong botID;
+        public bool devMode;
+        public ulong botOwnerID;
+        // Save location
+        public string SaveLocation;
+        //Database Config info
+        public string Host { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string Database { get; set; }
     }
 }

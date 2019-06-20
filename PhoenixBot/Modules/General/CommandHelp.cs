@@ -16,7 +16,7 @@ namespace PhoenixBot.Modules.General
             _service = service;
         }
         [Cooldown(15)]
-        [Command("help")]
+        [Command("help", RunMode = RunMode.Async)]
         [Alias("h")]
         [Remarks("DMs you a huge message if called without parameter - otherwise shows help to the provided command or module")]
         public async Task Help()
@@ -38,18 +38,18 @@ namespace PhoenixBot.Modules.General
                 await AddModuleEmbedField(module, builder);
             }
 
-            await dmChannel.SendMessageAsync("", false, builder.Build());
-
             // Embed are limited to 24 Fields at max. So lets clear some stuff
             // out and then send it in multiple embeds if it is too big.
             builder.WithTitle("")
                 .WithDescription("")
                 .WithAuthor("");
-            while (builder.Fields.Count > 24)
+            while(builder.Fields.Count > 15)
             {
-                builder.Fields.RemoveRange(0, 25);
                 await dmChannel.SendMessageAsync("", false, builder.Build());
+                builder.Fields.RemoveRange(0, 15);
+                builder.Fields.Sort();
             }
+
         }
         [Cooldown(15)]
         [Command("help")]

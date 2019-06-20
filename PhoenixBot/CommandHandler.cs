@@ -5,9 +5,7 @@ using Discord;
 using System.Threading.Tasks;
 using System.Reflection;
 using PhoenixBot.User_Accounts;
-using PhoenixBot.Modules.Music;
-using Victoria;
-using Microsoft.Extensions.DependencyInjection;
+
 
 namespace PhoenixBot
 {
@@ -16,9 +14,7 @@ namespace PhoenixBot
         DiscordSocketClient _client { get;  set; }
         CommandService _service { get; set; }
         IServiceProvider _provider { get; set; }
-        AudioService _audioService { get; set; }
-        LavaSocketClient _lavaSocketClient { get; set; }
-        LavaRestClient _lavaRestClient { get; set; }
+
 
         private ulong GuildId_ = Config.bot.guildID;
         private ulong eventChannelID = ChannelIds.channels.eventID;
@@ -28,11 +24,49 @@ namespace PhoenixBot
             _client = client;
             _service = new CommandService();
             _provider = serviceProvider;
-            _audioService = new AudioService(_lavaSocketClient, _lavaRestClient);
             await _service.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             _client.MessageReceived += PreCommandHandle;
             _client.UserJoined += UserJoined;
+            _client.UserBanned += UserBanned;
+            _client.UserLeft += UserLeft;
         }
+
+        private Task UserBanned(SocketUser arg1, SocketGuild arg2)
+        {
+            try
+            {
+                var account = UserAccounts.GetAccount(arg1);
+                UserAccounts.accounts.Remove(account);
+                UserAccounts.SaveAccounts();
+                var gAccount = Features.Games.UserAccounts.GameUserAccounts.GetAccount(arg1.Id);
+                Features.Games.UserAccounts.GameUserAccounts.accounts.Remove(gAccount);
+                Features.Games.UserAccounts.GameUserAccounts.SaveAccounts();
+                return Task.CompletedTask;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        private Task UserLeft(SocketGuildUser arg)
+        {
+            try
+            {
+                var account = UserAccounts.GetAccount(arg);
+                UserAccounts.accounts.Remove(account);
+                UserAccounts.SaveAccounts();
+                var gAccount = Features.Games.UserAccounts.GameUserAccounts.GetAccount(arg.Id);
+                Features.Games.UserAccounts.GameUserAccounts.accounts.Remove(gAccount);
+                Features.Games.UserAccounts.GameUserAccounts.SaveAccounts();
+                return Task.CompletedTask;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public async Task UserJoined(SocketGuildUser user)
         {
             var dataEmbed = new EmbedBuilder();
@@ -52,7 +86,7 @@ namespace PhoenixBot
 
             var useraccount = UserAccounts.GetAccount(context.User);
             // Mute check
-            if (useraccount.IsMuted)
+            if ((useraccount.IsMuted && context.User.IsBot == false) || (useraccount.IsMuted && context.Guild.OwnerId != context.User.Id))
             {
                 if (msg.Content.StartsWith("!Appeal mute") || msg.Content.StartsWith("!Appeal Mute") || msg.Content.StartsWith("!appeal mute") || msg.Content.StartsWith("!appeal Mute"))
                 {
@@ -73,8 +107,12 @@ namespace PhoenixBot
             var context = new SocketCommandContext(_client, msg);
             int argPos = 0;
             await _service.ExecuteAsync(context, argPos, _provider);
-            if (msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos)
-                || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
+            /*if (Config.bot.devMode == true && context.User.Id != Config.bot.botOwnerID && msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos))
+            {
+                await context.Channel.SendMessageAsync("Sorry but this is a Dev bot. If my name does not have Dev in it please contact my owner.");
+                return;
+            }*/
+            if (msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos))
             {
                 var result = await _service.ExecuteAsync(context, argPos, _provider);
 

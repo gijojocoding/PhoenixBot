@@ -23,7 +23,7 @@ namespace PhoenixBot.Features.Games.UserAccounts
         public float MonsterHP { get; set; }
         public float MonsterAttack { get; set; }
     }
-    public enum HuntingLevel 
+    public enum HuntingLevel : byte
     {
         Noob = 0,
         Novice = 1,

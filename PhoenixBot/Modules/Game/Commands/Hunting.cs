@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -18,10 +16,24 @@ namespace PhoenixBot.Modules.Game.Commands
         [Command("join")]
         public async Task JoinHunt()
         {
+            if (!RoleCheck.HasClerkRole((SocketGuildUser)Context.User))
+            {
+                await ReplyAsync(RoleWarning);
+                return;
+            }
             Console.WriteLine("Join command recived " + Context.User.Username + " has used the Hunt Join command.");
             GameUserAccounts.GetAccount(Context.User.Id);
             GameUserAccounts.SaveAccounts();
             await ReplyAsync($"{Context.User.Username} has been added to the hunt! Enjoy the hunt!");
+        }
+        [Command("quit")]
+        public async Task LeaveHunt()
+        {
+            var user = Context.User as SocketGuildUser;
+            var userAccount = GameUserAccounts.GetAccount(user.Id);
+            GameUserAccounts.accounts.Remove(userAccount);
+            GameUserAccounts.SaveAccounts();
+            await ReplyAsync("You have left the hunt game.");
         }
         [Command("search", RunMode = RunMode.Async)]
         [Cooldown(20, adminsAreLimited: true)]

@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Discord.WebSocket;
+
 
 namespace PhoenixBot.Features.Games.UserAccounts
 {
     public class GameUserAccounts
     {
         internal static List<GameUserAccount> accounts;
-        private static string accountsFile = "Resources/HuntAccounts.json";
+        private static string accountsFile = Config.bot.SaveLocation + "HuntAccounts.json";
 
 
         static GameUserAccounts()

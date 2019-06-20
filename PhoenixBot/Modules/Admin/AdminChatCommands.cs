@@ -29,6 +29,39 @@ namespace PhoenixBot.Modules.Admin
                 .AddField("How to Appeal your mute:", "Please use `!Appeal mute (your message)` exectly, if you don't get a dm from the bot then you entered in the `!Appeal mute` wrong.");
             await dmChannel.SendMessageAsync("", false, embed.Build());
         }
+        [Command("MassMute"), Alias("mmute")]
+        async Task AdminMassMuteCmd(params IGuildUser[] users)
+        {
+            foreach(var user in users)
+            {
+                var target = user as SocketGuildUser;
+                if (target == Context.Guild.Owner)
+                {
+                    await Context.User.SendMessageAsync("You can not mute the owner.");
+                }
+                else
+                {
+                    var account = UserAccounts.GetAccount(target);
+                    account.IsMuted = true;
+                    UserAccounts.SaveAccounts();
+                    await target.SendMessageAsync("Mass Chat Mute has been issued due to the number of people breaking rules so that it can be resolved without having to fight for control of the channel(s). Please wait for staff to post in the channel(s).");
+                }
+            }
+            await Context.User.SendMessageAsync("Users have been muted.");
+        }
+        [Command("MassUnMute"), Alias("munmute")]
+        async Task AdminMassUnMuteCmd(params IGuildUser[] users)
+        {
+            foreach (var user in users)
+            {
+                var target = user as SocketGuildUser;
+                var account = UserAccounts.GetAccount(target);
+                account.IsMuted = false;
+                UserAccounts.SaveAccounts();
+                await target.SendMessageAsync("Mass Chat Unmute has been done. ");
+            }
+            await Context.User.SendMessageAsync("Users have been unmuted.");
+        }
         [Command("unmute", RunMode = RunMode.Async)]
         async Task AddminUnmuteCmd(SocketGuildUser target)
         {
@@ -114,7 +147,6 @@ namespace PhoenixBot.Modules.Admin
                 .AddField("Reason:", reason);
             await dmChannel.SendMessageAsync("", false, embed.Build());
             await warnLog.SendMessageAsync($"**ADMIN WARN** {Context.User.Mention} warned {user.Mention} for {reason}");
-
         }
         [Command("purge")]
         [Summary("Admin command, deletes a set of messages. no log created.")]

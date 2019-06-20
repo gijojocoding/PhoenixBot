@@ -9,7 +9,7 @@ namespace PhoenixBot
 {
     class ChannelIds
     {
-        private const string configFolder = "Resources";
+        private static string configFolder = Config.bot.SaveLocation;
         private const string configFile = "channels.json";
 
         public static ChannelConfig channels;

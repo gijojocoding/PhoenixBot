@@ -7,9 +7,6 @@ namespace PhoenixBot.User_Accounts
     public class UserAccount
     {
         public ulong ID { get; set; }
-        public uint LoyaltyPoints { get; set; }
-
-
 
         public byte NumberOfWarnings { get; set; }
 

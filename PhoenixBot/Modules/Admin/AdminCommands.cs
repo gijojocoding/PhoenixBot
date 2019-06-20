@@ -2,24 +2,56 @@
 using System.Threading.Tasks;
 using Discord.Commands;
 using Discord;
-using Discord.WebSocket;
 using PhoenixBot.Guild_Accounts;
-//using PhoenixBot.Features.Event;
+using Discord.WebSocket;
+using PhoenixBot.Rules;
 
 namespace PhoenixBot.Modules.Admin
 {
     [RequireOwner]
     public class AdminCommands : ModuleBase<SocketCommandContext>
     {
+        private DiscordSocketClient _client {get; set;}
+        const string KingdomString = "kingdom";
+        const string DuchyString = "duchy";
+        const string CountyString = "county";
+        const string LocalString = "local";
+        [Command("Startingup", RunMode = RunMode.Async)]
+        async Task StartingScript()
+        {
+            var guild = Context.Guild;
+            ulong channelid = GetId.GetChannelID(guild, "general");
+            if (channelid == 0) return;
+            var channel = guild.GetTextChannel(channelid);
+            await channel.SendMessageAsync("Loading.");
+            await channel.SendMessageAsync("Loading Bubble Memory.");
+            await Task.Delay(2000);
+            await channel.SendMessageAsync("Bubble Memory Loaded.");
+            await Task.Delay(500);
+            await channel.SendMessageAsync("Initializing Bubble Memory.");
+            await Task.Delay(300);
+            await channel.SendMessageAsync("Bubble Memory Initialized.");
+            await Task.Delay(200);
+            await channel.SendMessageAsync("Bot is Loaded and Ready.");
+        }
+        [Command("blockchannel")]
+        async Task BlockChannelCmd(params SocketGuildUser[] users)
+        {
+            ulong channelid = 451890812175777802;
+            var channel = Global.Client.GetGuild(Context.Guild.Id).GetTextChannel(channelid);
+            foreach (var user in users)
+            {
+                var deny = new OverwritePermissions(viewChannel: PermValue.Deny);
+                await channel.AddPermissionOverwriteAsync(user, deny);
+            }
+        }
         [Command("ListEvents", RunMode = RunMode.Async)]
         public async Task ListEventsAdmin()
         {
             var eventChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.eventID);
             var guild = GuildAccounts.GetAccount(Global.Client.GetGuild(Config.bot.guildID));
             var guild1 = new EmbedBuilder();
-            var guild2 = new EmbedBuilder();
             var town1 = new EmbedBuilder();
-            var town2 = new EmbedBuilder();
             var group = new EmbedBuilder();
             if (guild.TownEvent1Running == true)
             {
@@ -27,30 +59,17 @@ namespace PhoenixBot.Modules.Admin
                 .WithDescription($"Date: {guild.TownEvent1Time.Date} at {guild.TownEvent1Time.TimeOfDay}");
                 await eventChannel.SendMessageAsync("", false, town1.Build());
             }
-            if (guild.TownEvent2Running == true)
-            {
-                town2.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
-                    .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
-                await eventChannel.SendMessageAsync("", false, town2.Build());
-            }
             await Task.Delay(1);
             if (guild.GuildEvent1Running == true)
             {
-                guild1.WithTitle($"**Town Event: {guild.TownEvent1Name}**")
-                    .WithDescription($"Date: {guild.TownEvent1Time.Date} at {guild.TownEvent1Time.TimeOfDay}");
+                guild1.WithTitle($"**Town Event: {guild.GuildEvent1Name}**")
+                    .WithDescription($"Date: {guild.GuildEvent1Time.Date} at {guild.GuildEvent1Time.TimeOfDay}");
                 await eventChannel.SendMessageAsync("", false, guild1.Build());
             }
-            if (guild.GuildEvent2Running == true)
-            {
-                guild2.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
-                    .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
-                await eventChannel.SendMessageAsync("", false, guild2.Build());
-            }
-            await Task.Delay(1);
             if (guild.GroupEventRunning == true)
             {
-                group.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
-                    .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
+                group.WithTitle($"**Town Event: {guild.GroupEventName}**")
+                    .WithDescription($"Date: {guild.GroupEventTime.Date} at {guild.GroupEventTime.TimeOfDay}");
                 await eventChannel.SendMessageAsync("", false, group.Build());
             }
         }
@@ -72,12 +91,6 @@ namespace PhoenixBot.Modules.Admin
                     .WithDescription($"Date: {guild.TownEvent1Time.Date} at {guild.TownEvent1Time.TimeOfDay}");
                     await eventChannel.SendMessageAsync("", false, town1.Build());
                 }
-                if (guild.TownEvent2Running == true)
-                {
-                    town2.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
-                        .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
-                    await eventChannel.SendMessageAsync("", false, town2.Build());
-                }
                 return;
             }
             else if (type == "guild")
@@ -88,19 +101,13 @@ namespace PhoenixBot.Modules.Admin
                         .WithDescription($"Date: {guild.TownEvent1Time.Date} at {guild.TownEvent1Time.TimeOfDay}");
                     await eventChannel.SendMessageAsync("", false, guild1.Build());
                 }
-                if (guild.GuildEvent2Running == true)
-                {
-                    guild2.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
-                        .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
-                    await eventChannel.SendMessageAsync("", false, guild2.Build());
-                }
             }
             else if (type == "group")
             {
                 if (guild.GroupEventRunning == true)
                 {
-                    group.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
-                        .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
+                    group.WithTitle($"**Town Event: {guild.GroupEventName}**")
+                        .WithDescription($"Date: {guild.GroupEventTime.Date} at {guild.GroupEventTime.TimeOfDay}");
                     await eventChannel.SendMessageAsync("", false, group.Build());
                 }
             }
@@ -143,17 +150,6 @@ namespace PhoenixBot.Modules.Admin
             GuildAccounts.SaveAccounts();
             await ReplyAsync($"Guild's random post time is now set. Time: {GuildAccounts.GetAccount(Context.Guild).DayChecked}");
         }
-        [Command("RandomFact", RunMode = RunMode.Async)]
-        [Summary("Posts a random fact.")]
-        [RequireOwner]
-        public async Task RandomFactPost()
-        {
-            string Post = Features.RandomFact.CallRandomFact();
-            var embed = new EmbedBuilder();
-            embed.WithTitle("Random Fact for the day")
-                .WithDescription(Post);
-            await Context.Channel.SendMessageAsync("", false, embed.Build());
-        }
         [Command("Ping")]
         [Summary("Returns a pong.")]
         [RequireUserPermission(GuildPermission.Administrator)]
@@ -164,12 +160,62 @@ namespace PhoenixBot.Modules.Admin
         [Command("SyncAccounts", RunMode = RunMode.Async)]
         async Task ConvertHuntCmd()
         {
-            foreach(var account in User_Accounts.UserAccounts.accounts)
+            foreach (var account in User_Accounts.UserAccounts.accounts)
             {
                 Features.Games.UserAccounts.GameUserAccounts.GetAccount(account.ID);
                 Features.Games.UserAccounts.GameUserAccounts.SaveAccounts();
             }
             await ReplyAsync("Accounts have been Synced!");
         }
-    } 
+
+        [Command("AddRule")]
+        async Task AddRuleCmd(byte number, [Remainder] string Rule)
+        {
+            var ruleArray = Rules.Rules.rules;
+            if (ruleArray.Count == number)
+            {
+                await ReplyAsync("Error: That Rule Number is taken.");
+                return;
+            }
+            if (ruleArray.Count == number - 1)
+            {
+                string ruleString = Rule;
+                var rule = Rules.Rules.CreateRule(number, ruleString);
+                Rules.Rules.SaveRules();
+                await Context.User.SendMessageAsync($"Rule {rule.RuleNumber}: {rule.RuleString}");
+                return;
+            }
+        }
+        [Command("UpdateRule")]
+        async Task UpdateRuleCmd(byte number, [Remainder] string newInfo)
+        {
+            var rule = Rules.Rules.GetRule(number);
+            rule.RuleString = newInfo;
+            Rules.Rules.SaveRules();
+            await Context.Channel.SendMessageAsync($"Rule Number {rule.RuleNumber} has been updated to {rule.RuleString}");
+        }
+        [Command("ListRules")]
+        async Task ListRulesCmd()
+        {
+            if(Rules.Rules.rules.Count == 0)
+            {
+                await Context.Channel.SendMessageAsync("Error: The Rule List is empty.");
+            }
+            var embed = new EmbedBuilder();
+            embed.WithTitle("Rules:");
+            foreach(var rule in Rules.Rules.rules)
+            {
+                embed.AddField(rule.RuleNumber.ToString(), rule.RuleString);
+            }
+                await Context.Channel.SendMessageAsync("", false, embed.Build());
+        }
+        [Command("PurgeRules")]
+        async Task PurgeRulesCmd()
+        {
+            var rules = Rules.Rules.rules;
+            rules.Clear();
+            Rules.Rules.SaveRules();
+            await ReplyAsync("Purge Complete.");
+        }
+    }
 }

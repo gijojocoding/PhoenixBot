@@ -9,7 +9,7 @@ namespace PhoenixBot
 {
     class RoleIds
     {
-        private const string configFolder = "Resources";
+        private static string configFolder = Config.bot.SaveLocation;
         private const string configFile = "RoleIds.json";
 
         public static RoleConfig roles;

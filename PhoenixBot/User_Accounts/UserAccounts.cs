@@ -10,7 +10,7 @@ namespace PhoenixBot.User_Accounts
     public static class UserAccounts
     {
         internal static List<UserAccount> accounts;
-        private static string accountsFile = "Resources/accounts.json";
+        private static string accountsFile = Config.bot.SaveLocation + "accounts.json";
 
 
         static UserAccounts()
@@ -55,7 +55,6 @@ namespace PhoenixBot.User_Accounts
             var newAccount = new UserAccount()
             {
                 ID = id,
-                LoyaltyPoints = 0,
                 NumberOfWarnings = 0,
                 IsMuted = false
 
