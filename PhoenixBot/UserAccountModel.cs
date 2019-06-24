@@ -6,7 +6,7 @@ namespace PhoenixBot
 {
     public class UserAccountModel
     {
-        public string Id { get; set; }
+        public ulong Id { get; set; }
 
         public int NumberOfWarnings { get; set; } = 0;
 

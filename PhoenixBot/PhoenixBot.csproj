@@ -41,11 +41,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="UserAcc.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="UserAccDB.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="UsersDB.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

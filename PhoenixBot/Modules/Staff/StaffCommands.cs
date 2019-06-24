@@ -62,7 +62,7 @@ namespace PhoenixBot.Modules.Staff
         {
             DataAccess Db = new DataAccess();;
             UserAccountModel model = new UserAccountModel();
-            model.Id = target.Id.ToString();
+            model.Id = target.Id;
             model.NumberOfWarnings = 0;
             model.IsMuted = 0;
 

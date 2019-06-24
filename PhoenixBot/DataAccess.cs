@@ -14,34 +14,35 @@ namespace PhoenixBot
         internal string nameS = "lite";
         public UserAccountModel GetUser(ulong userId)
         {
-            var idString = userId.ToString();
+            string idString = userId.ToString();
             using (IDbConnection connection = new SQLiteConnection(DataBaseHandler.CnnVal(nameS)))
             {
+                var t = Global.Client.GetGuild(Config.bot.guildID).GetUser(userId);
                 UserAccountModel model = new UserAccountModel();
                 //select * from UserAcc where @IdString
-                var users =  connection.Query($"SELECT * from UserAcc where Id = '{idString}';");
-                foreach( var user in users)
+                var users = connection.Query($"SELECT * from UserAcc where Id = " + t.Id + ";");
+                foreach (var user in users)
                 {
-                    if (userId.ToString() == user.Id)
-                    {
-                        model.Id = user.Id;
-                        model.NumberOfWarnings = user.NumberOfWarnings;
-                        model.IsMuted = user.IsMuted;
-                        return model;
-                    }
+
+                    model.Id = (ulong)user.Id;
+                    model.NumberOfWarnings = user.NumberOfWarnings;
+                    model.IsMuted = user.IsMuted;
+                    return model;
+
                 }
                 return model;
-            }   
+            }
         }
-        public void AddUser(ulong id)
+        public void AddUser(ulong UserId)
         {
-            string idString = id.ToString();
+            string idString = UserId.ToString();
             using (IDbConnection connection = new SQLiteConnection(DataBaseHandler.CnnVal(nameS)))
             {
                 connection.Open();
                 Console.WriteLine(connection.State);
-                var user = connection.Execute($"INSERT INTO UserAcc Values (Id, NumberOfWarnings, IsMuted);", new { Id = idString, NumberOfWarnings = 0, IsMuted = 0 });
+                var user = connection.Execute($"insert into UserAcc Values({ UserId }, 0, 0)");
                 connection.Close();
+                Console.WriteLine(connection.State);
             }
         }
         public void UpdateUserMute(ulong userId, bool isMusted)
