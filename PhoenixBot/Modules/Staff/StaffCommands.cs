@@ -31,25 +31,28 @@ namespace PhoenixBot.Modules.Staff
         }
         [Command("warn")]
         [Summary("Staff command, used to send a warning to a person. (tag person) (Rule number broken) \n \"Example: @Gijojo 4\" to tell them they broke rule 4")]
-        public async Task Warn(IGuildUser user, byte rule)
+        public async Task Warn(IGuildUser user, byte rule, [Remainder] string reason)
         {
             var warnLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.warningLogID);
             var dmChannel = await user.GetOrCreateDMChannelAsync();
             var ruleText = Rules.Rules.GetRule(rule);
             var embed = new EmbedBuilder();
             embed.WithTitle("**Staff Warn**")
-                .WithDescription($"Admin was forced to use the Admin warn command. Please use the `!Appeal Warn` command so the warn can be looked into. If possible please take screenshots if this was abuse of power. Leave rude comments and remarks out of the text/voice channels.")
+                .WithDescription($"Staff was forced to use the Staff warn command. Please use the `!Appeal Warn` command so the warn can be looked into. If possible please take screenshots if this was abuse of power. Leave rude comments and remarks out of the text/voice channels.")
                 .AddField("Rule number broken:", rule)
-                .AddField("Rule is:", ruleText);
+                .AddField("Rule is:", ruleText)
+                .AddField("Reason:", reason);
             await dmChannel.SendMessageAsync("", false, embed.Build());
-            await warnLog.SendMessageAsync($"**ADMIN WARN** {Context.User.Mention} warned {user.Mention} for breaking rule: {rule}");
+            await warnLog.SendMessageAsync($"**Staff WARN** {Context.User.Mention} warned {user.Mention} for breaking rule: {rule}. Reason: {reason}");
         }
+        [RequireOwner]
         [Command("testingget")]
         async Task getuser(IGuildUser target)
         {
             DataAccess Db = new DataAccess();
             var UserModel = Db.GetUser(target.Id);
-                var user = Context.Guild.GetUser(Converter.ConvertToUlong(UserModel.ToString()));
+            Console.WriteLine("Got User");
+                var user = Context.Guild.GetUser(UserModel.Id);
                 var e = new EmbedBuilder();
                 e.AddField("User: ", user.Username)
                     .AddField("Warning Count: ", UserModel.NumberOfWarnings)
@@ -57,24 +60,14 @@ namespace PhoenixBot.Modules.Staff
                 await ReplyAsync("", false, e.Build());
             
         }
+        [RequireOwner]
         [Command("testingadd")]
         async Task adduser(SocketGuildUser target)
         {
-            DataAccess Db = new DataAccess();;
-            UserAccountModel model = new UserAccountModel();
-            model.Id = target.Id;
-            model.NumberOfWarnings = 0;
-            model.IsMuted = 0;
-
+            DataAccess Db = new DataAccess();
             Db.AddUser(target.Id);
-            //UserAccountModel UserModel = Db.GetUser(target.Id);
-
-            //var user = Context.Guild.GetUser(Converter.ConvertToUlong(UserModel.IDString));
-            //var e = new EmbedBuilder();
-            //e.AddField("User: ", user.Username)
-            //    .AddField("Warning Count: ", UserModel.NumberOfWarnings)
-            //    .AddField("Mute Status: ", Converter.ConvertToBool(UserModel.IsMuted));
-            //await ReplyAsync("", false, e.Build());
         }
+
+
     }
 }

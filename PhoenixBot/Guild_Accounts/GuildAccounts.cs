@@ -8,7 +8,8 @@ namespace PhoenixBot.Guild_Accounts
     public static class GuildAccounts
     {
         private static List<GuildAccount> accounts;
-        private static string accountsFile = Config.bot.SaveLocation + "GuildAccounts.json";
+        private const string configFolder = "Resources";
+        private static string accountsFile =  configFolder + "/GuildAccounts.json";
 
 
         static GuildAccounts()

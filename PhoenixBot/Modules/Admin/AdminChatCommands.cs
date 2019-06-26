@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Discord.Commands;
 using Discord;
 using Discord.WebSocket;
-using PhoenixBot.User_Accounts;
 
 namespace PhoenixBot.Modules.Admin
 {
@@ -15,10 +14,10 @@ namespace PhoenixBot.Modules.Admin
         [Command("mute", RunMode = RunMode.Async)]
         async Task AdminMuteCmd(SocketGuildUser target, string reason = "You have actively violated several rules to the point that an Admin Mute has been issued.")
         {
+            DataAccess Db = new DataAccess();
             var muteLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.muteLogID);
-            var account = UserAccounts.GetAccount(target);
-            account.IsMuted = true;
-            UserAccounts.SaveAccounts();
+            Db.UpdateUserMute(target.Id, true);
+
             await muteLog.SendMessageAsync($"{target.Mention} has been muted by {Context.User.Mention} for {reason}.");
             var dmChannel = await target.GetOrCreateDMChannelAsync();
             await VMuteSubTask(target);
@@ -34,6 +33,7 @@ namespace PhoenixBot.Modules.Admin
         {
             foreach(var user in users)
             {
+                DataAccess Db = new DataAccess();
                 var target = user as SocketGuildUser;
                 if (target == Context.Guild.Owner)
                 {
@@ -41,34 +41,30 @@ namespace PhoenixBot.Modules.Admin
                 }
                 else
                 {
-                    var account = UserAccounts.GetAccount(target);
-                    account.IsMuted = true;
-                    UserAccounts.SaveAccounts();
+                    Db.UpdateUserMute(user.Id, true);
+                    
                     await target.SendMessageAsync("Mass Chat Mute has been issued due to the number of people breaking rules so that it can be resolved without having to fight for control of the channel(s). Please wait for staff to post in the channel(s).");
                 }
             }
             await Context.User.SendMessageAsync("Users have been muted.");
         }
         [Command("MassUnMute"), Alias("munmute")]
-        async Task AdminMassUnMuteCmd(params IGuildUser[] users)
+        async Task AdminMassUnMuteCmd(params SocketGuildUser[] users)
         {
+            DataAccess Db = new DataAccess();
             foreach (var user in users)
             {
-                var target = user as SocketGuildUser;
-                var account = UserAccounts.GetAccount(target);
-                account.IsMuted = false;
-                UserAccounts.SaveAccounts();
-                await target.SendMessageAsync("Mass Chat Unmute has been done. ");
+                Db.UpdateUserMute(user.Id, false);
+                await user.SendMessageAsync("Mass Chat Unmute has been done. ");
             }
             await Context.User.SendMessageAsync("Users have been unmuted.");
         }
         [Command("unmute", RunMode = RunMode.Async)]
         async Task AddminUnmuteCmd(SocketGuildUser target)
         {
+            DataAccess Db = new DataAccess();
             var muteLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.muteLogID);
-            var account = UserAccounts.GetAccount(target);
-            account.IsMuted = false;
-            UserAccounts.SaveAccounts();
+            Db.UpdateUserMute(target.Id, false);
             await muteLog.SendMessageAsync($"{target.Mention} has been Unmuted by {Context.User}");
             var dmChannel = await target.GetOrCreateDMChannelAsync();
             await VUnmuteSubTask(target);

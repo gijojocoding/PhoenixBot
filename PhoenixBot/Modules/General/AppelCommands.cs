@@ -15,20 +15,22 @@ namespace PhoenixBot.Modules.General
         [Summary("Puts in an appeal about a mute you are currently under.")]
         public async Task MuteAppeal([Remainder] string msg)
         {
-            var user = User_Accounts.UserAccounts.GetAccount(Context.User);
+            DataAccess Db = new DataAccess();
+            UserAccountModel user = new UserAccountModel();
+
+            user = Db.GetUser(Context.User.Id);
             var logChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.requestID);
             //var msg = Context.Message.Content.Remove(0, 13);
-            if (user.IsMuted == false)
+            if (user.IsMuted == 1)
             {
-                
-                await logChannel.SendMessageAsync($"{Context.User.Username} has sent an appeal without being muted.");
+                var embed = new EmbedBuilder();
+                embed.WithTitle($"Mute Appeal by {Context.User.Username}")
+                    .WithDescription(msg)
+                    .WithColor(0, 0, 150);
+                await logChannel.SendMessageAsync("", false, embed.Build());
                 return;
             }
-            var embed = new EmbedBuilder();
-            embed.WithTitle("Mute Appeal")
-                .WithDescription(msg)
-                .WithColor(0, 0, 150);
-            await logChannel.SendMessageAsync("", false, embed.Build());
+
 
         }
         [Command("Warning")]

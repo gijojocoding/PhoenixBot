@@ -21,10 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataBased\DataBased.sqlproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="System">
       <HintPath>System</HintPath>
     </Reference>

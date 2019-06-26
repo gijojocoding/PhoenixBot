@@ -4,7 +4,6 @@ using Discord.Commands;
 using Discord;
 using System.Threading.Tasks;
 using System.Reflection;
-using PhoenixBot.User_Accounts;
 
 
 namespace PhoenixBot
@@ -35,9 +34,6 @@ namespace PhoenixBot
         {
             try
             {
-                var account = UserAccounts.GetAccount(arg1);
-                UserAccounts.accounts.Remove(account);
-                UserAccounts.SaveAccounts();
                 var gAccount = Features.Games.UserAccounts.GameUserAccounts.GetAccount(arg1.Id);
                 Features.Games.UserAccounts.GameUserAccounts.accounts.Remove(gAccount);
                 Features.Games.UserAccounts.GameUserAccounts.SaveAccounts();
@@ -53,9 +49,6 @@ namespace PhoenixBot
         {
             try
             {
-                var account = UserAccounts.GetAccount(arg);
-                UserAccounts.accounts.Remove(account);
-                UserAccounts.SaveAccounts();
                 var gAccount = Features.Games.UserAccounts.GameUserAccounts.GetAccount(arg.Id);
                 Features.Games.UserAccounts.GameUserAccounts.accounts.Remove(gAccount);
                 Features.Games.UserAccounts.GameUserAccounts.SaveAccounts();
@@ -76,17 +69,20 @@ namespace PhoenixBot
             var dmChannel = await user.GetOrCreateDMChannelAsync();
             await dmChannel.SendMessageAsync($"{user}, welcome to Digital Phoenix! Please read the Rules channel." +
                 $"If you represent a guild please enter `!Diplomat` in the joining channel. Thank you", false, dataEmbed.Build());
+            DataAccess Db = new DataAccess();
+            Db.AddUser(user.Id);
 
         }
         private async Task PreCommandHandle(SocketMessage s)
         {
+            DataAccess Db = new DataAccess();
             var msg = s as SocketUserMessage;
             if (msg == null) return;
             var context = new SocketCommandContext(_client, msg);
-
-            var useraccount = UserAccounts.GetAccount(context.User);
+            UserAccountModel model = new UserAccountModel();
+            model = Db.GetUser(context.User.Id);
             // Mute check
-            if ((useraccount.IsMuted && context.User.IsBot == false) || (useraccount.IsMuted && context.Guild.OwnerId != context.User.Id))
+            if (model.IsMuted == 1 && context.User.IsBot == false)
             {
                 if (msg.Content.StartsWith("!Appeal mute") || msg.Content.StartsWith("!Appeal Mute") || msg.Content.StartsWith("!appeal mute") || msg.Content.StartsWith("!appeal Mute"))
                 {
@@ -112,7 +108,8 @@ namespace PhoenixBot
                 await context.Channel.SendMessageAsync("Sorry but this is a Dev bot. If my name does not have Dev in it please contact my owner.");
                 return;
             }*/
-            if (msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos))
+            if (!msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos)) return;
+            if(msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos))
             {
                 var result = await _service.ExecuteAsync(context, argPos, _provider);
 

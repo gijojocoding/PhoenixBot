@@ -4,8 +4,13 @@ using System.Threading.Tasks;
 using Discord;
 using PhoenixBot.Features;
 using Microsoft.Extensions.DependencyInjection;
+
 using System.Data;
 using MySql.Data;
+
+using System.Reflection;
+using Discord.Commands;
+
 
 namespace PhoenixBot.Modules.Music
 {
@@ -44,13 +49,10 @@ namespace PhoenixBot.Modules.Music
             await _handler.InitializeAsynce(_client, _serviceProvider);
             await Task.Delay(-1);
         }
-
-
         private async Task ConnectedLog()
         {
             Console.WriteLine($"Connected at: {DateTime.Now}");
         }
-
         private async Task ClientReady()
         {
             await EventReminder.EventTimeCheck();
@@ -60,15 +62,25 @@ namespace PhoenixBot.Modules.Music
         public async Task Log(LogMessage msg)
         {
             Console.WriteLine(msg.Message);
+
         }
         private async Task OnReady()
         {
             await EventReminder.EventTimeCheck();
+
         }
         public void CloseBot()
         {
             var code = Environment.ExitCode;
             Environment.Exit(code);
+            try
+            {
+                
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
     }
 }

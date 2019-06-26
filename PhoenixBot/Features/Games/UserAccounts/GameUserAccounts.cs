@@ -7,12 +7,12 @@ namespace PhoenixBot.Features.Games.UserAccounts
     public class GameUserAccounts
     {
         internal static List<GameUserAccount> accounts;
-        private static string accountsFile = Config.bot.SaveLocation + "HuntAccounts.json";
-
+        private static string accountsFile = "HuntAccounts.json";
+        private const string configFolder = "Resources";
 
         static GameUserAccounts()
         {
-            if (GameUserStorage.SaveFileExists(accountsFile))
+            if (GameUserStorage.SaveFileExists(configFolder + "/" +accountsFile))
             {
                 accounts = GameUserStorage.LoadUserAccounts(accountsFile).ToList();
             }

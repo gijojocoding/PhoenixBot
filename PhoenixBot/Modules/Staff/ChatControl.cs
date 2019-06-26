@@ -16,15 +16,11 @@ namespace PhoenixBot.Modules.Staff
         public async Task Mute(IGuildUser user, [Remainder]string reason = "")
         {
             var muteLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.muteLogID);
-            SocketUser target = null;
-            var mentionedUser = Context.Message.MentionedUsers.FirstOrDefault();
-            target = mentionedUser;
-            var account = User_Accounts.UserAccounts.GetAccount(target);
 
             if (RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) || RoleCheck.HasChiefRole((SocketGuildUser)Context.User) || Context.User.Id == Context.Guild.Owner.Id)
             {
                 //var target = user as SocketGuildUser;
-                if (target == Context.Guild.Owner)
+                if (user == Context.Guild.Owner)
                 {
                     await Context.User.SendMessageAsync("You can not mute the owner.");
                     return;
@@ -33,14 +29,14 @@ namespace PhoenixBot.Modules.Staff
                 {
                     await Context.Channel.SendMessageAsync("Failed to provide reason for the command.");
                 }
-                account.IsMuted = true;
-                User_Accounts.UserAccounts.SaveAccounts();
-                await muteLog.SendMessageAsync($"{target.Mention} has been muted by {Context.User.Mention} for {reason}.");
+                DataAccess Db = new DataAccess();
+                Db.UpdateUserMute(user.Id, true);
+
+                await muteLog.SendMessageAsync($"{user.Mention} has been muted by {Context.User.Mention} for {reason}.");
                 var dmChannel = await user.GetOrCreateDMChannelAsync();
-                await VMute(user, reason);
                 var embed = new EmbedBuilder();
                 embed.WithTitle("**Staff Mute**")
-                    .WithDescription($"{target.Username}, this an automated message. At the momement you are muted on all channels, please read the following as to why and how to get the mute removed.")
+                    .WithDescription($"{user.Username}, this an automated message. At the momement you are muted on all channels, please read the following as to why and how to get the mute removed.")
                     .AddField("Reason for the mute:", reason)
                     .AddField("How to Appeal your mute:", "Please use `!Appeal mute (your message)` exectly, if you don't get a dm from the bot then you entered in the `!Appeal mute` wrong. If you feel this was abuse by a staff member please use the Appeal command and then send a DM to the server owner.");
                 await dmChannel.SendMessageAsync("", false, embed.Build());
@@ -56,17 +52,11 @@ namespace PhoenixBot.Modules.Staff
         public async Task UnMute(IGuildUser user)
         {
             var muteLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.muteLogID);
-            SocketUser target = null;
-            var mentionedUser = Context.Message.MentionedUsers.FirstOrDefault();
-            target = mentionedUser;
-            var account = User_Accounts.UserAccounts.GetAccount(target);
             if (RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) || RoleCheck.HasChiefRole((SocketGuildUser)Context.User) || Context.User.Id == Context.Guild.Owner.Id)
             {
-                account.IsMuted = false;
-                User_Accounts.UserAccounts.SaveAccounts();
-                await muteLog.SendMessageAsync($"{target.Mention} has been unmuted. Their setting is {account.IsMuted}");
+                DataAccess Db = new DataAccess();
+                Db.UpdateUserMute(user.Id, false);
                 var dmChannel = await user.GetOrCreateDMChannelAsync();
-                await VUnmute(user);
                 await dmChannel.SendMessageAsync($"{user.Mention},  you have been unmuted, please follow the rules from now on. If you feel it was from abuse of power please send a message to the Server  owner if you have not already done so.");
             }
             else
@@ -77,14 +67,26 @@ namespace PhoenixBot.Modules.Staff
         }
         [Command("warn")]
         [Summary("Staff command, used to send a warning to a person.")]
-        public async Task Warn(IGuildUser user, [Remainder] string reason)
+        public async Task Warn(SocketGuildUser user, byte rule , [Remainder] string reason)
         {
-            var warnLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.warningLogID);
-            var dmChannel = await user.GetOrCreateDMChannelAsync();
+
             if (RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User))
             {
-                await dmChannel.SendMessageAsync($"{user.Mention} was warned for {reason}");
-                await warnLog.SendMessageAsync($"{Context.User.Mention} warned {user.Mention} for {reason}");
+
+                DataAccess Db = new DataAccess();
+                UserAccountModel model = new UserAccountModel();
+                var warnLog = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.warningLogID);
+                var dmChannel = await user.GetOrCreateDMChannelAsync();
+                var ruleText = Rules.Rules.GetRule(rule).RuleString;
+                Db.UpdateUserWarning(user.Id, 1);
+                var embed = new EmbedBuilder();
+                embed.WithTitle("**Staff Warn**")
+                    .WithDescription($"Staff was forced to use the Staff warn command. Please use the `!Appeal Warn` command so the warn can be looked into. If possible please take screenshots if this was abuse of power. Leave rude comments and remarks out of the text/voice channels.")
+                    .AddField("Rule number broken:", rule)
+                    .AddField("Rule is:", ruleText)
+                    .AddField("Reason:", reason);
+                await dmChannel.SendMessageAsync("", false, embed.Build());
+                await warnLog.SendMessageAsync($"**Staff WARN** {Context.User.Mention} warned {user.Mention} for breaking rule: {rule}. Reason: {reason}");
             }
         }
         [Command("Ban")]
