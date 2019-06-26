@@ -9,7 +9,7 @@ namespace PhoenixBot
 {
     class ChangeLog
     {
-        private static string folder = Config.bot.SaveLocation;
+        private const string folder = "Resources";
         private const string changeLogFile = "ChangeLog.json";
 
         public static BotChangeLog log;

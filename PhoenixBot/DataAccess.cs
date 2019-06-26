@@ -6,12 +6,23 @@ using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PhoenixBot
 {
     public class DataAccess
     {
         internal string nameS = "lite";
+        public void test()
+        {
+            using (IDbConnection connection = new SQLiteConnection(DataBaseHandler.CnnVal(nameS)))
+            {
+                connection.Open();
+                Console.WriteLine(connection.State);
+                connection.Close();
+                Console.WriteLine(connection.State);
+            }
+        }
         public UserAccountModel GetUser(ulong userId)
         {
             string idString = userId.ToString();
@@ -21,12 +32,13 @@ namespace PhoenixBot
                 UserAccountModel model = new UserAccountModel();
                 //select * from UserAcc where @IdString
                 var users = connection.Query($"SELECT * from UserAcc where Id = " + t.Id + ";");
-                foreach (var user in users)
+                var UsersL = users.ToList();
+                foreach (var p in UsersL)
                 {
-
-                    model.Id = (ulong)user.Id;
-                    model.NumberOfWarnings = user.NumberOfWarnings;
-                    model.IsMuted = user.IsMuted;
+                    //Console.WriteLine($" Id: {p.Id} \n Warnings: {p.NumberOfWarnings} \n Is Muted: {p.IsMuted}");
+                    model.Id = (ulong) p.Id;
+                    model.NumberOfWarnings = (byte) p.NumberOfWarnings;
+                    model.IsMuted = (byte) p.IsMuted;
                     return model;
 
                 }
@@ -49,17 +61,32 @@ namespace PhoenixBot
         {
             var idString = Converter.ConvertToString(userId);
             int Mute = Converter.ConvertFromBool(isMusted);
-            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(DataBaseHandler.CnnVal("nameS")))
+            using (IDbConnection connection = new SQLiteConnection(DataBaseHandler.CnnVal(nameS)))
             {
-                connection.Execute("dbo.spUpdateMute @id @mute", new {id = idString, mute = Mute });
+                connection.Execute($"update UserAcc set IsMuted = {Converter.ConvertFromBool(isMusted)} WHERE Id = {userId};");
             }
         }
-        public void UpdateUserWarning(ulong userId, int warningAdd = 1)
+        public void UpdateUserWarning(ulong userId, byte warningAdd)
         {
             var idString = Converter.ConvertToString(userId);
-            using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(DataBaseHandler.CnnVal("Default")))
+            using (IDbConnection connection = new SQLiteConnection(DataBaseHandler.CnnVal(nameS)))
             {
-                connection.Execute("dbo.spUpdateWarning @id @warning", new { id = idString, warning = warningAdd});
+                UserAccountModel model = new UserAccountModel();
+                connection.Open();
+
+                var users = connection.Query($"SELECT * from UserAcc where Id = " + userId + ";");
+                var UsersL = users.ToList();
+                foreach (var p in UsersL)
+                {
+                    Console.WriteLine($" Id: {p.Id} \n Warnings: {p.NumberOfWarnings} \n Is Muted: {p.IsMuted}");
+                    model.Id = (ulong)p.Id;
+                    model.NumberOfWarnings = (byte)p.NumberOfWarnings;
+                    model.IsMuted = (byte)p.IsMuted;
+                    connection.Execute($"update UserAcc set NumberOfWarnings = {warningAdd + model.NumberOfWarnings} WHERE Id = {userId};");
+                }
+
+                connection.Close();
+
             }
         }
     }

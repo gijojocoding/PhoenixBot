@@ -9,6 +9,7 @@ using PhoenixBot.Rules;
 namespace PhoenixBot.Modules.Admin
 {
     [RequireOwner]
+    [Group("admin")]
     public class AdminCommands : ModuleBase<SocketCommandContext>
     {
         private DiscordSocketClient _client {get; set;}
@@ -16,6 +17,7 @@ namespace PhoenixBot.Modules.Admin
         const string DuchyString = "duchy";
         const string CountyString = "county";
         const string LocalString = "local";
+
         [Command("Startingup", RunMode = RunMode.Async)]
         async Task StartingScript()
         {
@@ -157,16 +159,6 @@ namespace PhoenixBot.Modules.Admin
         {
             await ReplyAsync($"Pong {Context.User}!");
         }
-        [Command("SyncAccounts", RunMode = RunMode.Async)]
-        async Task ConvertHuntCmd()
-        {
-            foreach (var account in User_Accounts.UserAccounts.accounts)
-            {
-                Features.Games.UserAccounts.GameUserAccounts.GetAccount(account.ID);
-                Features.Games.UserAccounts.GameUserAccounts.SaveAccounts();
-            }
-            await ReplyAsync("Accounts have been Synced!");
-        }
 
         [Command("AddRule")]
         async Task AddRuleCmd(byte number, [Remainder] string Rule)
@@ -216,6 +208,13 @@ namespace PhoenixBot.Modules.Admin
             rules.Clear();
             Rules.Rules.SaveRules();
             await ReplyAsync("Purge Complete.");
+        }
+        [Command("TestConnection")]
+        [Alias("TestCnn")]
+        async Task TestConnection()
+        {
+            DataAccess Db = new DataAccess();
+            Db.test();
         }
     }
 }

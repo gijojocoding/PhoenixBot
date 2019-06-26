@@ -1,6 +1,0 @@
-﻿CREATE TABLE [dbo].[Users]
-(
-	[Id] NVARCHAR(100) NOT NULL PRIMARY KEY, 
-    [NumberOfWarning] INT NULL DEFAULT 0, 
-    [IsMuted] SMALLINT NULL DEFAULT 0
-)
