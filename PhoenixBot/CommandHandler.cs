@@ -4,7 +4,10 @@ using Discord.Commands;
 using Discord;
 using System.Threading.Tasks;
 using System.Reflection;
-
+using PhoenixBot.User_Accounts;
+using PhoenixBot.Modules.Music;
+using Victoria;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PhoenixBot
 {
@@ -13,7 +16,9 @@ namespace PhoenixBot
         DiscordSocketClient _client { get;  set; }
         CommandService _service { get; set; }
         IServiceProvider _provider { get; set; }
-
+        AudioService _audioService { get; set; }
+        LavaSocketClient _lavaSocketClient { get; set; }
+        LavaRestClient _lavaRestClient { get; set; }
 
         private ulong GuildId_ = Config.bot.guildID;
         private ulong eventChannelID = ChannelIds.channels.eventID;
@@ -23,9 +28,11 @@ namespace PhoenixBot
             _client = client;
             _service = new CommandService();
             _provider = serviceProvider;
+            _audioService = new AudioService(_lavaSocketClient, _lavaRestClient);
             await _service.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             _client.MessageReceived += PreCommandHandle;
             _client.UserJoined += UserJoined;
+
             _client.UserBanned += UserBanned;
             _client.UserLeft += UserLeft;
         }
@@ -59,7 +66,6 @@ namespace PhoenixBot
                 throw;
             }
         }
-
         public async Task UserJoined(SocketGuildUser user)
         {
             var dataEmbed = new EmbedBuilder();
@@ -75,6 +81,7 @@ namespace PhoenixBot
         }
         private async Task PreCommandHandle(SocketMessage s)
         {
+
             //DataAccess Db = new DataAccess();
             var msg = s as SocketUserMessage;
             //if (msg == null) return;
@@ -95,6 +102,30 @@ namespace PhoenixBot
             //    return;
             //}
             //if (context.User.IsBot) return;
+
+            DataAccess Db = new DataAccess();
+            var msg = s as SocketUserMessage;
+            if (msg == null) return;
+            var context = new SocketCommandContext(_client, msg);
+            UserAccountModel model = new UserAccountModel();
+            model = Db.GetUser(context.User.Id);
+            // Mute check
+
+            if (model.IsMuted == 1 && context.User.IsBot == false)
+
+            if (useraccount.IsMuted)
+            {
+                if (msg.Content.StartsWith("!Appeal mute") || msg.Content.StartsWith("!Appeal Mute") || msg.Content.StartsWith("!appeal mute") || msg.Content.StartsWith("!appeal Mute"))
+                {
+                    await HandleCommandAsync(msg);
+                    await Task.Delay(1);
+                    //var newMsg = msg.Content.TrimStart((char)12);
+                    //await Appeal((SocketGuildUser)context.User, newMsg, context.Guild);
+                }
+                await context.Message.DeleteAsync();
+                return;
+            }
+            if (context.User.IsBot) return;
             await HandleCommandAsync(msg);
 
         }
@@ -103,12 +134,18 @@ namespace PhoenixBot
             var context = new SocketCommandContext(_client, msg);
             int argPos = 0;
             await _service.ExecuteAsync(context, argPos, _provider);
+
             /*if (Config.bot.devMode == true && context.User.Id != Config.bot.botOwnerID && msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos))
             {
                 await context.Channel.SendMessageAsync("Sorry but this is a Dev bot. If my name does not have Dev in it please contact my owner.");
                 return;
             }*/
-            if (msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos))
+            if (!msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos)) return;
+            if(msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos))
+
+            if (msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos)
+                || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
+
             {
                 var result = await _service.ExecuteAsync(context, argPos, _provider);
 

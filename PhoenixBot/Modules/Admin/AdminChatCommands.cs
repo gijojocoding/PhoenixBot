@@ -28,6 +28,7 @@ namespace PhoenixBot.Modules.Admin
                 .AddField("How to Appeal your mute:", "Please use `!Appeal mute (your message)` exectly, if you don't get a dm from the bot then you entered in the `!Appeal mute` wrong.");
             await dmChannel.SendMessageAsync("", false, embed.Build());
         }
+<<<<<<< HEAD
         [Command("MassMute"), Alias("mmute")]
         async Task AdminMassMuteCmd(params IGuildUser[] users)
         {
@@ -59,6 +60,8 @@ namespace PhoenixBot.Modules.Admin
             }
             await Context.User.SendMessageAsync("Users have been unmuted.");
         }
+=======
+>>>>>>> parent of 0f2d20e... Working on SQL storage
         [Command("unmute", RunMode = RunMode.Async)]
         async Task AddminUnmuteCmd(SocketGuildUser target)
         {
@@ -143,6 +146,7 @@ namespace PhoenixBot.Modules.Admin
                 .AddField("Reason:", reason);
             await dmChannel.SendMessageAsync("", false, embed.Build());
             await warnLog.SendMessageAsync($"**ADMIN WARN** {Context.User.Mention} warned {user.Mention} for {reason}");
+
         }
         [Command("purge")]
         [Summary("Admin command, deletes a set of messages. no log created.")]

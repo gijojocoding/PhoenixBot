@@ -12,22 +12,37 @@ namespace PhoenixBot.Modules.Admin
     public class UserInfo : ModuleBase<SocketCommandContext>
     {
         [Command("usersinfo")]
-        async Task UsersInfo(params IGuildUser[] users)
+        async Task UsersInfo(SocketGuildUser user)
         {
-            if (users == null)
-            {
-                return;
-            }
+                DataAccess Db = new DataAccess();
+                UserAccountModel account = new UserAccountModel();
+                account = Db.GetUser(user.Id);
+                var e = new EmbedBuilder();
+                e.WithTitle("User Info")
+                    .AddField("Warnings: ", account.NumberOfWarnings)
+                    .AddField("Mute State: ", Converter.ConvertToBool(account.IsMuted));
+                await ReplyAsync("", false, e.Build());
+        }
 
-            foreach (var user_ in users)
+        [Command("dbsync", RunMode = RunMode.Async)]
+        async Task SyncDB()
+        {
+            DataAccess Db = new DataAccess();
+            foreach(var user in Context.Guild.Users)
             {
+
                 DataAccess Db = new DataAccess();
                 UserAccountModel account = new UserAccountModel();
                 var user = user_ as SocketGuildUser;
                 account = Db.GetUser(user.Id);
                 await Context.Channel.SendMessageAsync($"{user.Username} has: \n{account.NumberOfWarnings} warnings. \n{account.IsMuted} is not Muted.");
                 Task.Delay(100);
+
+                Db.AddUser(user.Id);
+                Task.Delay(5000);
+
             }
+            await ReplyAsync("Synced");
         }
         [Command("dbsync", RunMode = RunMode.Async)]
         async Task SyncDB()
