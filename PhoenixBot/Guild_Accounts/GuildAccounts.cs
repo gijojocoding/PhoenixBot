@@ -8,8 +8,12 @@ namespace PhoenixBot.Guild_Accounts
     public static class GuildAccounts
     {
         private static List<GuildAccount> accounts;
+<<<<<<< HEAD
         private const string configFolder = "Resources";
         private static string accountsFile =  configFolder + "/GuildAccounts.json";
+=======
+        private static string accountsFile = "Resources/GuildAccounts.json";
+>>>>>>> parent of 0f2d20e... Working on SQL storage
 
 
         static GuildAccounts()
@@ -62,7 +66,9 @@ namespace PhoenixBot.Guild_Accounts
                 StickHolderId = 0,
                 AllowSummoning = false,
                 GuildEvent1Running = false,
+                GuildEvent2Running = false,
                 TownEvent1Running = false,
+                TownEvent2Running = false,
                 GroupEventRunning = false,
                 TownRaffleRunning = false,
                 TownRaffleInfo = null,

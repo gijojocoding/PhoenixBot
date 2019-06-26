@@ -5,14 +5,14 @@ using Discord;
 using PhoenixBot.Guild_Accounts;
 using Discord.WebSocket;
 
-namespace PhoenixBot.Modules.Staff
+namespace PhoenixBot.Modules.Admin
 {
     [Group("Debate")]
-    [RequireUserPermission(GuildPermission.SendTTSMessages)]
-    public class StaffDebateCommands : ModuleBase<SocketCommandContext>
+    [Alias("AD")]
+    public class AdminDebateCommands : ModuleBase<SocketCommandContext>
     {
         [Command("Open", RunMode = RunMode.Async)]
-        [Summary("Staff command to open the debate channels.")]
+        [Summary("Admin command to open the debate channels.")]
         public async Task OpenDebate(string target = "guild")
         {
             if (!RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) || !RoleCheck.HasChiefRole((SocketGuildUser)Context.User) || Context.User.Id != Context.Guild.Owner.Id) return;
@@ -22,7 +22,6 @@ namespace PhoenixBot.Modules.Staff
             var tDeny = new OverwritePermissions(connect: PermValue.Deny, readMessageHistory: PermValue.Deny, sendMessages: PermValue.Deny);
             var voiceChannel = Context.Guild.GetVoiceChannel(ChannelIds.channels.debateVCID);
             var textChannel = Context.Guild.GetTextChannel(ChannelIds.channels.debateTCID);
-
             if(target == "guild")
             {
                 await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.guildMemberID), vAllow);
@@ -39,13 +38,11 @@ namespace PhoenixBot.Modules.Staff
                 await textChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.guildMemberID), tAllow);
                 await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.townMemberID), vAllow);
                 await textChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.townMemberID), tAllow);
-
             }
             await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.guildMemberID), vAllow);
             await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, vDeny);
             await textChannel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, tDeny);
-            var logChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.messageLogID);
-            await logChannel.SendMessageAsync($"{Context.User.Username} has opened the Debate Channels. Target openned for: {target}");
+
             var guild = GuildAccounts.GetAccount(Context.Guild);
             Console.WriteLine(guild);
             guild.StickHolderId = 0;
@@ -57,7 +54,7 @@ namespace PhoenixBot.Modules.Staff
             await Context.Channel.SendMessageAsync("Both debate channels should be open.");
         }
         [Command("Close")]
-        [Summary("Staff command to close the debate channels.")]
+        [Summary("Admin command to close the debate channels.")]
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task CloseDebate()
         {
@@ -83,12 +80,10 @@ namespace PhoenixBot.Modules.Staff
             await textChannel.AddPermissionOverwriteAsync(Context.Guild.GetRole(RoleIds.roles.townMemberID), tDeny);
             guild.DebateRunning = false;
             GuildAccounts.SaveAccounts();
-            var logChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.messageLogID);
-            await logChannel.SendMessageAsync($"{Context.User.Username} has closed the debate Channels.");
         }
         [Command("GiveStick")]
         [Alias("GS")]
-        [Summary("Staff command to force the speaking stick to someone else")]
+        [Summary("Admin command to force the speaking stick to someone else")]
         public async Task GiveStick(SocketGuildUser user)
         {
             if (!RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) || !RoleCheck.HasChiefRole((SocketGuildUser)Context.User) || Context.User.Id != Context.Guild.Owner.Id) return;
@@ -109,7 +104,7 @@ namespace PhoenixBot.Modules.Staff
         }
         [Command("RemoveStick")]
         [Alias("RS")]
-        [Summary("Staff command to remove the speaking stick from the current holder.")]
+        [Summary("Admin command to remove the speaking stick from the current holder.")]
         public async Task RemoveStick(SocketGuildUser user)
         {
             if (!RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User) || !RoleCheck.HasChiefRole((SocketGuildUser)Context.User) || Context.User.Id != Context.Guild.Owner.Id) return;
@@ -128,7 +123,7 @@ namespace PhoenixBot.Modules.Staff
             await debateTC.SendMessageAsync("The speaking stick is open for grabs!");
         }
         [Command("info")]
-        [Summary("Staff command to get the current info on the debate.")]
+        [Summary("Admin command to get the current info on the debate.")]
         [RequireUserPermission(GuildPermission.Administrator)]
         public async Task DebateInfo()
         {

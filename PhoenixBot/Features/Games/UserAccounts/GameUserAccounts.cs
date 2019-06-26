@@ -1,14 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-
+using System.Text;
+using Discord.WebSocket;
 
 namespace PhoenixBot.Features.Games.UserAccounts
 {
     public class GameUserAccounts
     {
         internal static List<GameUserAccount> accounts;
+<<<<<<< HEAD
         private static string accountsFile = "HuntAccounts.json";
         private const string configFolder = "Resources";
+=======
+        private static string accountsFile = "Resources/HuntAccounts.json";
+
+>>>>>>> parent of 0f2d20e... Working on SQL storage
 
         static GameUserAccounts()
         {

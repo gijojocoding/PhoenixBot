@@ -4,7 +4,14 @@ using Discord.Commands;
 using Discord;
 using System.Threading.Tasks;
 using System.Reflection;
+<<<<<<< HEAD
 
+=======
+using PhoenixBot.User_Accounts;
+using PhoenixBot.Modules.Music;
+using Victoria;
+using Microsoft.Extensions.DependencyInjection;
+>>>>>>> parent of 0f2d20e... Working on SQL storage
 
 namespace PhoenixBot
 {
@@ -13,7 +20,9 @@ namespace PhoenixBot
         DiscordSocketClient _client { get;  set; }
         CommandService _service { get; set; }
         IServiceProvider _provider { get; set; }
-
+        AudioService _audioService { get; set; }
+        LavaSocketClient _lavaSocketClient { get; set; }
+        LavaRestClient _lavaRestClient { get; set; }
 
         private ulong GuildId_ = Config.bot.guildID;
         private ulong eventChannelID = ChannelIds.channels.eventID;
@@ -23,9 +32,11 @@ namespace PhoenixBot
             _client = client;
             _service = new CommandService();
             _provider = serviceProvider;
+            _audioService = new AudioService(_lavaSocketClient, _lavaRestClient);
             await _service.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             _client.MessageReceived += PreCommandHandle;
             _client.UserJoined += UserJoined;
+<<<<<<< HEAD
             _client.UserBanned += UserBanned;
             _client.UserLeft += UserLeft;
         }
@@ -60,6 +71,9 @@ namespace PhoenixBot
             }
         }
 
+=======
+        }
+>>>>>>> parent of 0f2d20e... Working on SQL storage
         public async Task UserJoined(SocketGuildUser user)
         {
             var dataEmbed = new EmbedBuilder();
@@ -82,7 +96,11 @@ namespace PhoenixBot
             UserAccountModel model = new UserAccountModel();
             model = Db.GetUser(context.User.Id);
             // Mute check
+<<<<<<< HEAD
             if (model.IsMuted == 1 && context.User.IsBot == false)
+=======
+            if (useraccount.IsMuted)
+>>>>>>> parent of 0f2d20e... Working on SQL storage
             {
                 if (msg.Content.StartsWith("!Appeal mute") || msg.Content.StartsWith("!Appeal Mute") || msg.Content.StartsWith("!appeal mute") || msg.Content.StartsWith("!appeal Mute"))
                 {
@@ -103,6 +121,7 @@ namespace PhoenixBot
             var context = new SocketCommandContext(_client, msg);
             int argPos = 0;
             await _service.ExecuteAsync(context, argPos, _provider);
+<<<<<<< HEAD
             /*if (Config.bot.devMode == true && context.User.Id != Config.bot.botOwnerID && msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos))
             {
                 await context.Channel.SendMessageAsync("Sorry but this is a Dev bot. If my name does not have Dev in it please contact my owner.");
@@ -110,6 +129,10 @@ namespace PhoenixBot
             }*/
             if (!msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos)) return;
             if(msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos))
+=======
+            if (msg.HasStringPrefix(Config.bot.cmdPrefix, ref argPos)
+                || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
+>>>>>>> parent of 0f2d20e... Working on SQL storage
             {
                 var result = await _service.ExecuteAsync(context, argPos, _provider);
 

@@ -3,17 +3,14 @@ using System.Threading.Tasks;
 using Discord.Commands;
 using Discord;
 using Discord.WebSocket;
-using PhoenixBot.Rules;
 
 namespace PhoenixBot.Modules.Staff
 {
-    [Group("Staff")]
-    //[RequireUserPermission(GuildPermission.SendTTSMessages)]
     public class StaffCommands : ModuleBase<SocketCommandContext>
     {
         [Command("DMMessage")]
         [Summary("Sends a DM to the person tagged. **Must have the role of Chief or Investment Staff.")]
-
+        [RequireUserPermission(GuildPermission.KickMembers)]
         public async Task AdminDmMessage(SocketGuildUser user, [Remainder] string message)
         {
             if (!RoleCheck.HasChiefRole((SocketGuildUser)Context.User) || !RoleCheck.HasInvestmentStaffRole((SocketGuildUser)Context.User))
@@ -29,6 +26,7 @@ namespace PhoenixBot.Modules.Staff
             await dmChannel.SendMessageAsync($"This is a message from the discord server saying: {message}");
             await messageLog.SendMessageAsync($"{Context.User.Mention} sent a message to {target.Mention}. Message was: {message}");
         }
+<<<<<<< HEAD
         [Command("warn")]
         [Summary("Staff command, used to send a warning to a person. (tag person) (Rule number broken) \n \"Example: @Gijojo 4\" to tell them they broke rule 4")]
         public async Task Warn(IGuildUser user, byte rule, [Remainder] string reason)
@@ -69,5 +67,7 @@ namespace PhoenixBot.Modules.Staff
         }
 
 
+=======
+>>>>>>> parent of 0f2d20e... Working on SQL storage
     }
 }

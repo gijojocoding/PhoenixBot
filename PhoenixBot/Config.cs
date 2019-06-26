@@ -14,6 +14,7 @@ namespace PhoenixBot
 
         public static BotConfig bot;
 
+
         static Config()
         {
             if (!Directory.Exists(configFolder)) Directory.CreateDirectory(configFolder);
@@ -29,7 +30,6 @@ namespace PhoenixBot
                 bot = JsonConvert.DeserializeObject<BotConfig>(json);
             }
         }
-        
     }
     public struct BotConfig
     {
@@ -39,7 +39,10 @@ namespace PhoenixBot
         public ulong guildID;
         // bot ID
         public ulong botID;
+<<<<<<< HEAD
         public bool devMode;
         public ulong botOwnerID;
+=======
+>>>>>>> parent of 0f2d20e... Working on SQL storage
     }
 }

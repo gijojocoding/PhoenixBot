@@ -3,28 +3,18 @@ using System.Threading.Tasks;
 using Discord.Commands;
 using Discord;
 using PhoenixBot.Guild_Accounts;
-using Discord.WebSocket;
 
 namespace PhoenixBot.Modules.Owner
 {
-    
-    [RequireOwner]
-    [Group("Owner")]
     public class ServerInfo : ModuleBase<SocketCommandContext>
     {
-        [Command("CloseBot")]
-        [Summary("Emergency Command to turn the bot off.")]
-        async Task CloseBot()
-        {
-            var code = Environment.ExitCode;
-            Environment.Exit(code);
-        }
         [Command("roleinfo")]
+        [RequireOwner]
         public async Task RoleInfo()
         {
             string info = "These are the Roles for Digital Phoenix Investments. More maybe added for groups within the server! **ALL CHIEF AND STAFF ROLES ARE MERIT ONLY!**";
             string owner = "Leader of the guild, with the final say to resolve issues.";
-            string HigherGov = "This role is only for members that are, and proven, to be Government members from County, Duchy, or Kingdom level.";
+            string botrole = "The role for the bot";
             string Chief = "The `Chief` roles are for the higher ranked members on the guild. They have their respected area they help manage.";
             string Staff = "The staff that help sort out issues and welcome new members.";
             string trader = "Traders that mainly stick to the town.";
@@ -37,9 +27,8 @@ namespace PhoenixBot.Modules.Owner
             embed.WithTitle("Role Info")
                 .WithDescription(info)
                 .AddField("Chief Executive Officer:", owner)
+                .AddField("Bots:", botrole)
                 .AddField("Chief roles following the bot role:", Chief)
-                .AddField("Higher Government:", HigherGov)
-                .AddField("Town Council:", "Members who help give advise on issues. Town Members have as much say as a Council member.")
                 .AddField("Investment Staff:", Staff)
                 .AddField("Trader:", trader)
                 .AddField("Traveling Trader:", travelingTrader)
@@ -50,6 +39,7 @@ namespace PhoenixBot.Modules.Owner
             await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
         [Command("IDCheck", RunMode = RunMode.Async)]
+        [RequireOwner]
         public async Task GetAllIDs()
         {
             var Guild = Global.Client.GetGuild(Context.Guild.Id);
@@ -79,8 +69,9 @@ namespace PhoenixBot.Modules.Owner
             await Task.Delay(1000);
             await Context.Channel.SendMessageAsync("Command has finished.");
         }
-        [Command("GuildDetails"), Alias("GD")]
+        [Command("GuildDetails")]
         [Summary("Gives server details about the server")]
+        [RequireOwner]
         public async Task GetGuildDetails([Remainder] string info = "")
         {
             var currentGuild = Context.Guild;
@@ -91,7 +82,7 @@ namespace PhoenixBot.Modules.Owner
             var verificationLevel = currentGuild.VerificationLevel; //
             var regionId = currentGuild.VoiceRegionId; //
             var embed = new EmbedBuilder();
-            if (info.ToLower() == "general")
+            if (info == "General")
             {
                 embed.WithTitle($"Info for: {currentGuild.Name}")
                 .AddField("Guild Owner:", ownerUsername)
@@ -101,7 +92,8 @@ namespace PhoenixBot.Modules.Owner
                 .AddField("AFK Timer:", afkTimer)
                 .AddField("AFK Channel:", afkChannel)
                 .WithColor(30, 60, 120);
-                await Context.Channel.SendMessageAsync("", false, embed.Build());
+                var ChannelToPostTo = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.generalID);
+                await ChannelToPostTo.SendMessageAsync("", false, embed.Build());
                 return;
             }
             else if (info == "" || info == " ")
@@ -117,12 +109,11 @@ namespace PhoenixBot.Modules.Owner
                 await Context.Channel.SendMessageAsync("", false, embed.Build());
                 return;
             }
-            else if (info.ToLower() == "membercount")
+            else if (info == "Membercount")
             {
                 embed.WithTitle($"Guild Info for: {currentGuild.Name}")
                     .AddField("Member Count:", memberCount)
                     .WithColor(30, 60, 120);
-                await Context.Channel.SendMessageAsync("", false, embed.Build());
             }
             else
             {

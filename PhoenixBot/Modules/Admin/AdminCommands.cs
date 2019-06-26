@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Discord.Commands;
 using Discord;
-using PhoenixBot.Guild_Accounts;
 using Discord.WebSocket;
-using PhoenixBot.Rules;
+using PhoenixBot.Guild_Accounts;
+//using PhoenixBot.Features.Event;
 
 namespace PhoenixBot.Modules.Admin
 {
@@ -12,6 +12,7 @@ namespace PhoenixBot.Modules.Admin
     [Group("admin")]
     public class AdminCommands : ModuleBase<SocketCommandContext>
     {
+<<<<<<< HEAD
         private DiscordSocketClient _client {get; set;}
         const string KingdomString = "kingdom";
         const string DuchyString = "duchy";
@@ -47,13 +48,17 @@ namespace PhoenixBot.Modules.Admin
                 await channel.AddPermissionOverwriteAsync(user, deny);
             }
         }
+=======
+>>>>>>> parent of 0f2d20e... Working on SQL storage
         [Command("ListEvents", RunMode = RunMode.Async)]
         public async Task ListEventsAdmin()
         {
             var eventChannel = Global.Client.GetGuild(Config.bot.guildID).GetTextChannel(ChannelIds.channels.eventID);
             var guild = GuildAccounts.GetAccount(Global.Client.GetGuild(Config.bot.guildID));
             var guild1 = new EmbedBuilder();
+            var guild2 = new EmbedBuilder();
             var town1 = new EmbedBuilder();
+            var town2 = new EmbedBuilder();
             var group = new EmbedBuilder();
             if (guild.TownEvent1Running == true)
             {
@@ -61,17 +66,30 @@ namespace PhoenixBot.Modules.Admin
                 .WithDescription($"Date: {guild.TownEvent1Time.Date} at {guild.TownEvent1Time.TimeOfDay}");
                 await eventChannel.SendMessageAsync("", false, town1.Build());
             }
+            if (guild.TownEvent2Running == true)
+            {
+                town2.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
+                    .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
+                await eventChannel.SendMessageAsync("", false, town2.Build());
+            }
             await Task.Delay(1);
             if (guild.GuildEvent1Running == true)
             {
-                guild1.WithTitle($"**Town Event: {guild.GuildEvent1Name}**")
-                    .WithDescription($"Date: {guild.GuildEvent1Time.Date} at {guild.GuildEvent1Time.TimeOfDay}");
+                guild1.WithTitle($"**Town Event: {guild.TownEvent1Name}**")
+                    .WithDescription($"Date: {guild.TownEvent1Time.Date} at {guild.TownEvent1Time.TimeOfDay}");
                 await eventChannel.SendMessageAsync("", false, guild1.Build());
             }
+            if (guild.GuildEvent2Running == true)
+            {
+                guild2.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
+                    .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
+                await eventChannel.SendMessageAsync("", false, guild2.Build());
+            }
+            await Task.Delay(1);
             if (guild.GroupEventRunning == true)
             {
-                group.WithTitle($"**Town Event: {guild.GroupEventName}**")
-                    .WithDescription($"Date: {guild.GroupEventTime.Date} at {guild.GroupEventTime.TimeOfDay}");
+                group.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
+                    .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
                 await eventChannel.SendMessageAsync("", false, group.Build());
             }
         }
@@ -93,6 +111,12 @@ namespace PhoenixBot.Modules.Admin
                     .WithDescription($"Date: {guild.TownEvent1Time.Date} at {guild.TownEvent1Time.TimeOfDay}");
                     await eventChannel.SendMessageAsync("", false, town1.Build());
                 }
+                if (guild.TownEvent2Running == true)
+                {
+                    town2.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
+                        .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
+                    await eventChannel.SendMessageAsync("", false, town2.Build());
+                }
                 return;
             }
             else if (type == "guild")
@@ -103,13 +127,19 @@ namespace PhoenixBot.Modules.Admin
                         .WithDescription($"Date: {guild.TownEvent1Time.Date} at {guild.TownEvent1Time.TimeOfDay}");
                     await eventChannel.SendMessageAsync("", false, guild1.Build());
                 }
+                if (guild.GuildEvent2Running == true)
+                {
+                    guild2.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
+                        .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
+                    await eventChannel.SendMessageAsync("", false, guild2.Build());
+                }
             }
             else if (type == "group")
             {
                 if (guild.GroupEventRunning == true)
                 {
-                    group.WithTitle($"**Town Event: {guild.GroupEventName}**")
-                        .WithDescription($"Date: {guild.GroupEventTime.Date} at {guild.GroupEventTime.TimeOfDay}");
+                    group.WithTitle($"**Town Event: {guild.TownEvent2Name}**")
+                        .WithDescription($"Date: {guild.TownEvent2Time.Date} at {guild.TownEvent2Time.TimeOfDay}");
                     await eventChannel.SendMessageAsync("", false, group.Build());
                 }
             }
@@ -152,6 +182,17 @@ namespace PhoenixBot.Modules.Admin
             GuildAccounts.SaveAccounts();
             await ReplyAsync($"Guild's random post time is now set. Time: {GuildAccounts.GetAccount(Context.Guild).DayChecked}");
         }
+        [Command("RandomFact", RunMode = RunMode.Async)]
+        [Summary("Posts a random fact.")]
+        [RequireOwner]
+        public async Task RandomFactPost()
+        {
+            string Post = Features.RandomFact.CallRandomFact();
+            var embed = new EmbedBuilder();
+            embed.WithTitle("Random Fact for the day")
+                .WithDescription(Post);
+            await Context.Channel.SendMessageAsync("", false, embed.Build());
+        }
         [Command("Ping")]
         [Summary("Returns a pong.")]
         [RequireUserPermission(GuildPermission.Administrator)]
@@ -159,6 +200,7 @@ namespace PhoenixBot.Modules.Admin
         {
             await ReplyAsync($"Pong {Context.User}!");
         }
+<<<<<<< HEAD
 
         [Command("AddRule")]
         async Task AddRuleCmd(byte number, [Remainder] string Rule)
@@ -217,4 +259,17 @@ namespace PhoenixBot.Modules.Admin
             Db.test();
         }
     }
+=======
+        [Command("SyncAccounts", RunMode = RunMode.Async)]
+        async Task ConvertHuntCmd()
+        {
+            foreach(var account in User_Accounts.UserAccounts.accounts)
+            {
+                Features.Games.UserAccounts.GameUserAccounts.GetAccount(account.ID);
+                Features.Games.UserAccounts.GameUserAccounts.SaveAccounts();
+            }
+            await ReplyAsync("Accounts have been Synced!");
+        }
+    } 
+>>>>>>> parent of 0f2d20e... Working on SQL storage
 }
